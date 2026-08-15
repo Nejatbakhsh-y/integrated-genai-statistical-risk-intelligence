@@ -1,0 +1,6 @@
+field,unit,nonmissing_count,missing_count,negative_count,minimum,maximum
+assets,USD_NEAREST_DOLLAR,79775,7,0,0.0,57481633454.0
+liabilities,USD_NEAREST_DOLLAR,79772,10,0,0.0,53864321148.0
+contributions,USD_NEAREST_DOLLAR,76314,3468,33,-55219600.0,6893818112.0
+benefit_payments,USD_NEAREST_DOLLAR,76223,3559,11,-776146.0,19744136140.0
+participants,COUNT,79782,0,0,0.0,538898.0

@@ -1,0 +1,33 @@
+version: "0.3.0"
+status: "frozen_at_sponsor_universe_release"
+
+source:
+  authority: "U.S. Department of Labor, Employee Benefits Security Administration"
+  source_form_year_start: 2015
+  source_form_year_end: 2025
+  dataset_policy: "Latest"
+  db_identification_method: "Schedule SB linked to Form 5500 through ACK_ID"
+
+milestone_2_population:
+  plan_year_start: 2015
+  plan_year_end: 2024
+  provisional_excluded_plan_years:
+    - 2025
+  public_corporation_filter_applied: false
+  public_corporation_filter_stage: "Milestone 3 SEC/Form 5500 entity resolution"
+
+rationale:
+  - "Eligibility is determined from reported plan_year rather than source-folder form year."
+  - "Plan year 2025 is preserved locally but excluded from v0.3.0 because the August 15, 2026 source snapshot is materially incomplete."
+  - "Older delinquent plan-year filings are preserved locally but excluded from the v0.3.0 primary plan-year window."
+  - "The public-company restriction is applied and audited in Milestone 3, not asserted in Milestone 2."
+
+units:
+  monetary_fields: "U.S. dollars, unscaled; treated as nearest-dollar amounts."
+  participants: "count"
+
+primary_artifact:
+  path: "data/processed/sponsor_plan_universe.parquet"
+
+interim_provenance_artifact:
+  path: "data/interim/sponsor_plan_universe_all_available.parquet"
