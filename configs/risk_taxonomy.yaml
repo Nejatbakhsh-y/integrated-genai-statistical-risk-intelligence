@@ -1,0 +1,11 @@
+version: "0.1.0"
+status: "protocol_frozen"
+
+domains:
+  - climate_catastrophe
+  - cyber_digital
+  - financial_crime_kyc
+  - sustainability_reputation
+  - operational_ai_workforce
+  - regulatory_legal
+  - financial_stress

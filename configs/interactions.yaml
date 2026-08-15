@@ -1,0 +1,10 @@
+version: "0.1.0"
+status: "protocol_frozen"
+
+interactions:
+  - climate_x_financial_stress
+  - cyber_x_operational_dependence
+  - cyber_x_reputation_regulatory
+  - operational_transformation_x_workforce
+  - regulatory_x_financial_stress
+  - climate_x_asset_collateral_exposure

@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "integrated-genai-statistical-risk-intelligence"
+version = "0.1.0"
+description = "Evidence-grounded GenAI and statistical learning for integrated corporate risk early warning."
+readme = "README.md"
+requires-python = ">=3.11,<3.15"
+license = "MIT"
+
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scipy>=1.13",
+    "statsmodels>=0.14",
+    "scikit-learn>=1.5",
+    "pyarrow>=17",
+    "pydantic>=2.8",
+    "PyYAML>=6.0",
+    "requests>=2.32",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "matplotlib>=3.9"
+]
+
+[project.optional-dependencies]
+
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

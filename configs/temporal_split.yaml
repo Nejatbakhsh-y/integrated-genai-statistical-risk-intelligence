@@ -1,0 +1,9 @@
+version: "0.1.0"
+
+primary_validation: chronological
+
+random_split_primary: false
+
+rolling_origin_if_feasible: true
+
+final_holdout_status: pending_data_completeness_review

@@ -1,0 +1,24 @@
+version: "0.1.0"
+
+models:
+
+  M0:
+    inputs: funded_ratio_current
+
+  M1:
+    inputs: X
+
+  M2:
+    inputs: X
+
+  M3:
+    inputs: X_plus_conventional_NLP
+
+  M4:
+    inputs: X_plus_Z
+
+  M5:
+    inputs: X_plus_Z_plus_I
+
+  M6:
+    inputs: nonlinear_X_plus_Z_plus_I
