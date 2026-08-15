@@ -37,4 +37,10 @@ cache/
 .cache/
 
 *.log
-bootstrap_recovery.ps1
+bootstrap_recovery.ps1data/raw/form5500/
+data/processed/*.parquet
+work/
+*.part
+data/raw/form5500/
+data/interim/*.parquet
+milestone2_close.ps1

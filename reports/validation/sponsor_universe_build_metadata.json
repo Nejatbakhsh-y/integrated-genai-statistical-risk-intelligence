@@ -1,0 +1,14 @@
+{
+  "generated_utc": "2026-08-15T21:58:33.556120+00:00",
+  "source": "U.S. Department of Labor Form 5500 datasets",
+  "source_page": "https://www.dol.gov/agencies/ebsa/about-ebsa/our-activities/public-disclosure/foia/form-5500-datasets",
+  "dataset_policy": "Latest",
+  "db_identification": "Schedule SB linked by ACK_ID",
+  "start_year": 2015,
+  "end_year": 2025,
+  "rows": 80045,
+  "unique_plans": 13545,
+  "unique_sponsors": 11535,
+  "duplicate_plan_years": 0,
+  "primary_artifact": "data\\processed\\sponsor_plan_universe.parquet"
+}

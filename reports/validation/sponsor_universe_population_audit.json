@@ -1,0 +1,22 @@
+{
+  "generated_utc": "2026-08-15T22:24:31.506342+00:00",
+  "candidate_rows": 80045,
+  "candidate_unique_sponsors": 11535,
+  "candidate_unique_plans": 13545,
+  "eligible_rows": 79782,
+  "eligible_unique_sponsors": 11520,
+  "eligible_unique_plans": 13527,
+  "plan_year_start": 2015,
+  "plan_year_end": 2024,
+  "excluded_pre_target_rows": 44,
+  "excluded_post_horizon_rows": 219,
+  "provisional_year": 2025,
+  "provisional_year_rows": 219,
+  "prior_complete_year_rows": 5349,
+  "provisional_to_prior_row_ratio": 0.04094223219293326,
+  "duplicate_plan_year_rows": 0,
+  "public_corporation_filter_applied": false,
+  "public_corporation_filter_stage": "Milestone 3 SEC/Form 5500 entity resolution",
+  "candidate_parquet_sha256": "0EFBF5F02D3CA073ED5958516BF72B08C4A368EBD7A7023F69AF0F2F23685A2D",
+  "final_parquet_sha256": "ED22F81E6F6E407F0494CDBB94AB6D8FA84B9CF576C637D02E20A013735E6255"
+}
