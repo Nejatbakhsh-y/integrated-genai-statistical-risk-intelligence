@@ -1,0 +1,30 @@
+{
+  "created_utc": "2026-08-16T19:26:54.011475+00:00",
+  "crosswalk_policy": "Only Step 3.6 rows with linkage_accepted=True may enter Step 3.7 as accepted fuzzy-derived links.",
+  "fuzzy_auto_accept": false,
+  "fuzzy_auto_reject": false,
+  "machine_decisions_labeled_as_human": false,
+  "milestone": 3,
+  "policy_name": "CONSERVATIVE_UNRESOLVED_RETENTION",
+  "population": {
+    "accepted_matches": 6,
+    "supported_no_match": 1663,
+    "total_sponsors": 2153,
+    "unresolved_retained_unmatched": 484
+  },
+  "protocol_version": "3.6-hybrid-v1.1",
+  "review_method": "HYBRID_HUMAN_AND_DETERMINISTIC_IDENTIFIER_ADJUDICATION",
+  "score_100_manual_review_complete": true,
+  "step": "3.6",
+  "step_3_6_complete": true,
+  "step_3_7_executed": false,
+  "unresolved_reclassified_as_no_match": false,
+  "unresolved_semantics": {
+    "final_disposition": "RETAIN_UNMATCHED_UNRESOLVED",
+    "included_in_step_3_7_crosswalk": false,
+    "means_fuzzy_rejected": false,
+    "means_human_reviewed": false,
+    "means_machine_rejected": false,
+    "means_no_match": false
+  }
+}

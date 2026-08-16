@@ -1,0 +1,25 @@
+{
+  "accepted_match_breakdown": {
+    "deterministic_exact_ein": 3,
+    "deterministic_exact_legal_name": 1,
+    "manual": 2
+  },
+  "accepted_matches": 6,
+  "accepted_matches_sha256": "A8883AA5B43CDCB7A926BD2DBC18E27CF9A8C36302298B2F618BACD7902CF069",
+  "final_disposition_sha256": "FD51CA384E12BA2BAAD969163ACCBD35433F351F84B8B4C41891CA7C574D78F2",
+  "fuzzy_auto_accept": false,
+  "fuzzy_auto_reject": false,
+  "input_candidate_evidence_sha256": "BDCDA540E977645087CE1A77C68CFD8F0C2AC5E706935909E352F3706F55B0D8",
+  "input_hybrid_sha256": "33E47231D7DA70899EADF01AA286375D5C4A6FBDE0ABFD4BB34C90EAC6299715",
+  "machine_decisions_labeled_as_human": false,
+  "milestone": 3,
+  "protocol_version": "3.6-hybrid-v1.1",
+  "score_100_manual_review_complete": true,
+  "status": "PASS",
+  "step": "3.6",
+  "step_3_7_executed": false,
+  "supported_no_match": 1663,
+  "total_sponsors": 2153,
+  "unresolved_reclassified_as_no_match": false,
+  "unresolved_retained_unmatched": 484
+}
