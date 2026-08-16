@@ -1,7 +1,7 @@
-version: "4.1.0"
+version: "4.2.0"
 milestone: 4
-step: "4.1"
-status: "step_4_1_pension_base_frozen"
+step: "4.2"
+status: "step_4_2_sec_financials_frozen"
 
 description: >
   Structured sponsor-year information set X(i,t) integrating pension,
@@ -21,11 +21,29 @@ primary_artifact:
 step_4_1_artifact:
   path: "data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet"
   git_tracked: false
+  expected_sha256: "2140DCC58293583A5E4877E6E03FBF919C1BAB1022BD6752F5F33C7AA2B84529"
   expected_rows: 5934
   expected_unique_sponsors: 729
   grain:
     - sponsor_id
     - plan_year
+
+step_4_2_artifacts:
+  sec_sponsor_year_financials:
+    path: "data/interim/structured_x/step_4_2/sec_sponsor_year_financials.parquet"
+    git_tracked: false
+    expected_sha256: "92C7F0A2FD89D0A75C3175FE00544B975C2371C2C27B3DFAD4591962E4FA45C8"
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  joined_pension_sec_base:
+    path: "data/interim/structured_x/step_4_2/pension_sec_sponsor_year_base.parquet"
+    git_tracked: false
+    expected_sha256: "09F93E43AA169CE95A7AF98E923C0E6FF6DFEEE8E987564A90E9A86BD7EC7883"
+    expected_rows: 5934
+    grain:
+      - sponsor_id
+      - plan_year
 
 panel:
   grain:
@@ -52,10 +70,98 @@ frozen_inputs:
     expected_unique_plans: 1294
     expected_unique_sponsors: 729
     expected_unique_sponsor_years: 5934
+  step_4_1_pension_base:
+    path: "data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet"
+    expected_sha256: "2140DCC58293583A5E4877E6E03FBF919C1BAB1022BD6752F5F33C7AA2B84529"
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+
+raw_source_provenance:
+  sec_companyfacts:
+    source_family: "SEC_EDGAR_XBRL_COMPANYFACTS"
+    endpoint_template: "https://data.sec.gov/api/xbrl/companyfacts/CIK##########.json"
+    authentication_required: false
+    local_raw_directory: "data/raw/sec_xbrl/companyfacts"
+    git_tracked: false
+    manifest: "reports/validation/milestone4_step_4_2_raw_companyfacts_manifest.csv"
+    attempted_ciks: 729
+    http_200_or_cache: 724
+    http_404_no_companyfacts: 5
+
+sponsor_financial_alignment:
+  transformation_version: "4.2.0"
+  source_family: "SEC_EDGAR_XBRL"
+  monetary_unit: "USD"
+  annual_forms:
+    - "10-K"
+    - "10-K/A"
+    - "10-KT"
+    - "10-KT/A"
+    - "20-F"
+    - "20-F/A"
+    - "40-F"
+    - "40-F/A"
+  fiscal_year_rule: "XBRL fact fy == sponsor plan_year"
+  temporal_eligibility_rule: "fact filed_date <= sponsor-year forecast_cutoff"
+  period_end_rule: "fact period_end <= sponsor-year forecast_cutoff"
+  duration_rule: "annual duration contexts must span 250 through 450 days inclusive"
+  selection_rule: >
+    Among eligible synonym concepts, select the latest period_end, then the latest
+    filed_date, then the lowest frozen concept-priority rank, then accession number.
+  future_backfill_allowed: false
+  retrospective_restated_value_after_cutoff_allowed: false
+  non_usd_currency_conversion_allowed: false
+  concept_priority:
+    total_assets:
+      - "us-gaap:Assets"
+      - "ifrs-full:Assets"
+    total_liabilities:
+      - "us-gaap:Liabilities"
+      - "ifrs-full:Liabilities"
+    debt:
+      - "us-gaap:LongTermDebtAndFinanceLeaseObligations"
+      - "us-gaap:LongTermDebt"
+      - "us-gaap:LongTermDebtAndFinanceLeaseObligationsNoncurrent"
+      - "us-gaap:LongTermDebtNoncurrent"
+      - "ifrs-full:Borrowings"
+      - "ifrs-full:NoncurrentBorrowings"
+    cash:
+      - "us-gaap:CashAndCashEquivalentsAtCarryingValue"
+      - "us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents"
+      - "ifrs-full:CashAndCashEquivalents"
+    revenue:
+      - "us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax"
+      - "us-gaap:SalesRevenueNet"
+      - "us-gaap:Revenues"
+      - "ifrs-full:Revenue"
+    operating_income:
+      - "us-gaap:OperatingIncomeLoss"
+      - "ifrs-full:ProfitLossFromOperatingActivities"
+    operating_cash_flow:
+      - "us-gaap:NetCashProvidedByUsedInOperatingActivities"
+      - "ifrs-full:CashFlowsFromUsedInOperatingActivities"
+    pension_plan_assets:
+      - "us-gaap:DefinedBenefitPlanFairValueOfPlanAssets"
+      - "ifrs-full:FairValueOfPlanAssets"
+    pension_projected_benefit_obligation:
+      - "us-gaap:DefinedBenefitPlanProjectedBenefitObligation"
+      - "ifrs-full:PresentValueOfDefinedBenefitObligation"
+    pension_employer_contributions:
+      - "us-gaap:DefinedBenefitPlanContributionsByEmployer"
+      - "ifrs-full:ContributionsByEmployer"
+  derived_variables:
+    profitability: "sec_operating_income / sec_revenue"
+    leverage: "sec_total_liabilities / sec_total_assets"
+    liquidity: "sec_cash / sec_total_assets"
+    pension_size: "Form5500 pension liabilities / sec_total_assets"
+    pension_assets_to_sponsor_assets: "Form5500 pension assets / sec_total_assets"
+    pension_contributions_to_revenue: "Form5500 contributions / sec_revenue"
+
 
 data_families:
   pension:
-    status: "step_4_1_base_constructed"
+    status: "step_4_1_base_constructed_step_4_2_denominator_added"
     fields:
       - funded_ratio
       - assets
@@ -63,26 +169,33 @@ data_families:
       - contributions
       - benefit_payments
       - participants
-    pension_size_status: "pending_sponsor_financial_denominator_review"
+      - pension_size
+      - pension_assets_to_sponsor_assets
+      - pension_liabilities_to_sponsor_assets
+      - pension_contributions_to_revenue
+    pension_size_status: "defined_step_4_2_as_form5500_liabilities_over_sec_total_assets"
 
   sponsor_financials:
-    status: "next_step_4_2"
+    status: "step_4_2_complete"
     source_family: "SEC_EDGAR_XBRL"
-    candidate_fields:
-      - total_assets
-      - total_liabilities
-      - debt
-      - cash
-      - revenue
-      - operating_income
-      - profitability
-      - operating_cash_flow
-      - leverage
-      - liquidity
-      - pension_statement_items
+    fields:
+      - sec_total_assets
+      - sec_total_liabilities
+      - sec_debt
+      - sec_cash
+      - sec_revenue
+      - sec_operating_income
+      - sec_operating_cash_flow
+      - sec_profitability
+      - sec_leverage
+      - sec_liquidity
+      - sec_pension_plan_assets
+      - sec_pension_projected_benefit_obligation
+      - sec_pension_employer_contributions
+    raw_missingness_preserved: true
 
   market:
-    status: "not_yet_ingested"
+    status: "next_step_4_3"
     candidate_fields:
       - equity_return
       - equity_volatility
@@ -114,7 +227,9 @@ pension_aggregation:
   source_provenance:
     available_plan_source_files_retained: true
   pension_size:
-    status: "definition_pending_sponsor_financial_denominator_review"
+    status: "defined_step_4_2"
+    rule: "Form5500 aggregate pension liabilities divided by SEC total assets"
+    require_positive_sec_total_assets: true
 
 temporal_integrity:
   required_columns:
@@ -143,12 +258,16 @@ temporal_integrity:
     late_plan_filings_excluded: true
     missing_information_date_excluded: true
     sponsor_year_skeleton_retained_when_no_plan_is_available: true
+    sec_facts_filed_after_cutoff_excluded: true
+    sec_facts_for_other_fiscal_years_excluded: true
+    sponsor_year_retained_when_sec_financials_missing: true
 
 missingness:
   silent_zero_fill_allowed: false
   future_backfill_allowed: false
   partial_plan_sum_when_available_field_missing: false
-  step_4_1_missingness_audit_required: true
+  sec_missingness_preserved: true
+  non_usd_sec_facts_preserved_as_missing: true
   final_imputation_policy_status: "not_selected"
 
 scientific_controls:
@@ -178,6 +297,22 @@ step_4_1_acceptance:
   interim_parquet_git_tracked: false
   step_4_1_status: "PASS"
 
+step_4_2_acceptance:
+  step_4_1_artifact_hash_frozen: true
+  linked_ciks_attempted: 729
+  sec_companyfacts_ingested: true
+  fiscal_year_alignment_verified: true
+  deterministic_concept_selection_verified: true
+  temporal_integrity_verified: true
+  temporal_violation_count: 0
+  sponsor_year_grain_preserved: true
+  expected_sponsor_year_rows_verified: true
+  missingness_preserved: true
+  pension_size_denominator_defined: true
+  interim_parquet_git_tracked: false
+  raw_companyfacts_git_tracked: false
+  step_4_2_status: "PASS"
+
 next_step:
-  id: "4.2"
-  name: "ingest_and_align_point_in_time_sec_xbrl_sponsor_financials"
+  id: "4.3"
+  name: "ingest_and_align_point_in_time_market_variables"

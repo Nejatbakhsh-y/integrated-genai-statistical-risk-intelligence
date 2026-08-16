@@ -2,122 +2,150 @@
 
 ## Status
 
-Milestone 4 remains in progress. Step 4.1 freezes the pension point-in-time
-forecast cutoff and constructs the audited sponsor-year pension base. The final
-multi-family structured panel is not yet complete and the release tag
-`v0.5.0-structured-panel` must not be created at this step.
+Milestone 4 remains in progress. Step 4.2 ingests and aligns annual SEC/EDGAR XBRL sponsor-financial information to the forecast cutoff frozen in Step 4.1. The final multi-family structured panel is not yet complete, and the release tag `v0.5.0-structured-panel` must not be created at this step.
 
 Target final local analytical artifact:
 
 `data/processed/sponsor_year_X.parquet`
 
-Step-4.1 local interim artifact:
+Frozen Step-4.1 pension artifact:
 
 `data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet`
 
-Both Parquet artifacts are local-only and must not be tracked in Git.
+Step-4.2 local artifacts:
+
+- `data/interim/structured_x/step_4_2/sec_sponsor_year_financials.parquet`
+- `data/interim/structured_x/step_4_2/pension_sec_sponsor_year_base.parquet`
+
+All Parquet artifacts and raw SEC Company Facts JSON files are local-only and must not be tracked in Git.
 
 ## Frozen Upstream Handoff
 
-Milestone 4 starts from `v0.4.0-entity-linkage` and the frozen sponsor-to-SEC
-crosswalk.
-
-Crosswalk SHA-256:
-
-`264FF2DCD22223B654C122B7EE6F69B23CEA71A8885937D976C1BBCF8203D55A`
-
-Sponsor-plan universe SHA-256 used by Step 4.1:
-
-`ED22F81E6F6E407F0494CDBB94AB6D8FA84B9CF576C637D02E20A013735E6255`
-
-Frozen linked pension population:
+The Step-4.2 analytical skeleton remains exactly:
 
 - 729 linked sponsors;
-- 1,294 linked pension plans;
-- 8,950 linked plan-year observations;
+- 729 unique SEC CIKs;
 - 5,934 sponsor-year observations;
-- plan years 2015 through 2024.
+- plan years 2015 through 2024;
+- grain `sponsor_id x plan_year`.
 
-## Step-4.1 Forecast Cutoff
-
-The Step-4.1 point-in-time policy is frozen as:
+The Step-4.1 forecast cutoff remains:
 
 `forecast_cutoff(i,t) = October 15 of calendar year t+1`
 
-The policy is common across sponsors for a given plan year and is fixed before
-model fitting or holdout evaluation. It is not selected using outcomes.
+Step 4.2 does not alter that policy.
 
-For pension inputs, a plan filing is analytically available only when:
+## SEC Company Facts Source
 
-`information_date <= forecast_cutoff`
+Step 4.2 uses the SEC EDGAR Company Facts endpoint:
 
-A filing with a missing information date or an information date after the
-cutoff does not enter the point-in-time pension aggregation. The sponsor-year
-skeleton remains present even when no plan filing is available by the cutoff.
+`https://data.sec.gov/api/xbrl/companyfacts/CIK##########.json`
 
-Step 4.1 records July 31, September 30, October 15, and December 31 candidate
-availability diagnostics for audit purposes. The frozen policy remains October
-15 of t+1; the diagnostics do not select a policy using model outcomes.
+The automation attempts all 729 frozen CIKs, writes the returned JSON to `data/raw/sec_xbrl/companyfacts/`, and records a tracked source manifest containing endpoint, HTTP status, byte count, SHA-256, entity name, taxonomy count, and concept count. Raw JSON is never committed.
 
-## Deterministic Pension Aggregation
+A 404 Company Facts response is treated as legitimate source unavailability and therefore produces analytical missingness. Other unrecoverable HTTP failures stop the step rather than being reinterpreted as missing financial data.
 
-The sponsor-year grain is:
+## Point-in-Time SEC Eligibility
 
-`sponsor_id x plan_year`
+A standardized SEC fact can enter sponsor-year `t` only when all of the following hold:
 
-For each sponsor-year, aggregation uses only filings available by the frozen
-cutoff.
+1. the filing is an annual form in the frozen allowlist (`10-K`, `10-K/A`, `10-KT`, `10-KT/A`, `20-F`, `20-F/A`, `40-F`, or `40-F/A`);
+2. the XBRL fiscal-year field satisfies `fy == plan_year`;
+3. the filing date is on or before the frozen sponsor-year forecast cutoff;
+4. the fact period end is on or before the forecast cutoff;
+5. duration facts use an annual context spanning 250 through 450 days;
+6. the fact is reported in USD.
 
-Rules:
+No filing submitted after the cutoff may revise an earlier sponsor-year value. No future observation is backfilled. A missing eligible fact remains missing.
 
-1. assets, liabilities, contributions, benefit payments, and participants are
-   summed across available plans only when the field is nonmissing for every
-   available plan;
-2. partial field sums are not created when an available plan is missing the
-   field;
-3. funded ratio equals aggregate assets divided by aggregate liabilities;
-4. funded ratio is missing when aggregate liabilities are unavailable or not
-   strictly positive;
-5. the unweighted mean of plan-level funded ratios is prohibited;
-6. participant counts are summed under the provisional Step-4.0 rule and a
-   `participants_overlap_risk` flag identifies sponsor-years with more than one
-   available plan;
-7. source-file provenance for available filings is retained;
-8. pension size remains pending until a sponsor-financial denominator is
-   defined in a later Milestone-4 step.
+## Deterministic Concept Selection
 
-## Step-4.1 Audit Artifacts
+Step 4.2 freezes ordered US-GAAP and IFRS synonym hierarchies for total assets, total liabilities, debt, cash, revenue, operating income, operating cash flow, and selected pension-statement items.
+
+For a metric with multiple eligible candidate facts, selection is deterministic:
+
+1. latest eligible period end;
+2. latest eligible filing date;
+3. lowest frozen concept-priority rank;
+4. accession number as the final deterministic tie-breaker.
+
+Selected concept, taxonomy, period start/end, filing date, form, accession number, unit, and concept-priority rank are retained in the local sponsor-year artifact.
+
+## Sponsor-Financial Variables
+
+The Step-4.2 sponsor-financial family contains:
+
+- `sec_total_assets`
+- `sec_total_liabilities`
+- `sec_debt`
+- `sec_cash`
+- `sec_revenue`
+- `sec_operating_income`
+- `sec_operating_cash_flow`
+- `sec_profitability = sec_operating_income / sec_revenue`
+- `sec_leverage = sec_total_liabilities / sec_total_assets`
+- `sec_liquidity = sec_cash / sec_total_assets`
+- `sec_pension_plan_assets`
+- `sec_pension_projected_benefit_obligation`
+- `sec_pension_employer_contributions`
+
+The debt field is a frozen hierarchy-based reported debt proxy: preferred total debt/finance-lease obligation concepts are used first, followed by long-term debt concepts when the preferred concepts are absent.
+
+## Pension Size Denominator
+
+Step 4.2 resolves the Step-4.1 pending sponsor-financial denominator by defining:
+
+`pension_size = Form5500 pension liabilities / SEC total assets`
+
+Additional scale variables are retained:
+
+- `pension_assets_to_sponsor_assets`
+- `pension_liabilities_to_sponsor_assets`
+- `pension_contributions_to_revenue`
+
+Ratios remain missing when their required numerator or denominator is missing or when a required asset denominator is not strictly positive.
+
+## Grain Preservation
+
+The SEC sponsor-year frame is joined one-to-one to the frozen Step-4.1 pension skeleton on:
+
+- `sponsor_id`
+- `sec_cik`
+- `plan_year`
+- `forecast_cutoff`
+
+The join must return exactly 5,934 rows and zero duplicate sponsor-years. Sponsor-years with no eligible SEC financial facts remain in the panel with missing sponsor-financial fields.
+
+## Step-4.2 Audit Artifacts
 
 Tracked audit artifacts include:
 
-- forecast-cutoff diagnostics;
-- sponsor-year temporal-detail audit;
-- pension missingness audit;
-- aggregation-identity audit;
-- pension coverage by plan year;
-- Step-4.1 summary audit JSON.
+- raw Company Facts source manifest;
+- sponsor-year temporal-integrity audit;
+- deterministic concept-selection summary;
+- sponsor-financial and derived-variable missingness audit;
+- financial coverage by plan year;
+- Step-4.2 summary audit JSON.
 
-The interim pension Parquet is explicitly excluded from Git.
+The local SEC and joined Parquet outputs are explicitly excluded from Git.
 
-## Step-4.1 Acceptance Gate
+## Step-4.2 Acceptance Gate
 
-Step 4.1 passes only if:
+Step 4.2 passes only if:
 
-1. the feature branch starts from the frozen Step-4.0 commit;
-2. the sponsor-universe and crosswalk hashes match the frozen inputs;
-3. the linked population reconciles to 8,950 plan-year rows, 1,294 plans, 729
-   sponsors, and 5,934 sponsor-years;
-4. the October-15-of-t+1 cutoff is frozen in configuration;
-5. the interim base contains exactly 5,934 unique sponsor-year rows;
-6. `information_date <= forecast_cutoff` has zero violations;
-7. deterministic aggregation identities pass;
-8. duplicate and missingness audits pass;
-9. Ruff and Pytest pass;
-10. no Parquet file is staged or committed;
-11. only Step-4.1 code, configuration, tests, documentation, and audit artifacts
-    are committed.
+1. execution starts on `feature/04-structured-x-panel` at the frozen Step-4.1 commit;
+2. the frozen Step-4.1 local artifact is present and its current SHA-256 is recorded;
+3. all 729 CIKs are attempted through the SEC Company Facts source;
+4. SEC annual facts satisfy the frozen fiscal-year and point-in-time filters;
+5. deterministic concept selection is applied exactly as configured;
+6. every selected SEC filing date is on or before `forecast_cutoff`;
+7. the sponsor-year SEC frame contains exactly 5,934 unique sponsor-year rows;
+8. the pension-plus-SEC join contains exactly 5,934 unique sponsor-year rows;
+9. missing SEC facts remain missing rather than being zero-filled or future-filled;
+10. Ruff, Pytest, and Git diff checks pass;
+11. no raw SEC JSON or Parquet file is staged or committed;
+12. only Step-4.2 code, configuration, tests, documentation, and tracked audit artifacts are committed.
 
 ## Next Step
 
-Step 4.2 will ingest and align point-in-time SEC/EDGAR XBRL sponsor-financial
-variables to the frozen sponsor-year cutoff policy.
+Step 4.3 will ingest and align point-in-time market variables while preserving the same 5,934-row sponsor-year grain and frozen forecast cutoff. Milestone 4 remains incomplete until the remaining structured-X families and final panel gates are complete.
