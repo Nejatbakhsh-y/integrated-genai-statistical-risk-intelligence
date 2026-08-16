@@ -1,0 +1,134 @@
+version: "4.0.0"
+milestone: 4
+step: "4.0"
+status: "step_4_0_contract_frozen"
+
+description: >
+  Structured sponsor-year information set X(i,t) integrating pension,
+  sponsor-financial, market, and prespecified macro information under
+  explicit information-date controls.
+
+release:
+  base_tag: "v0.4.0-entity-linkage"
+  target_tag: "v0.5.0-structured-panel"
+
+primary_artifact:
+  path: "data/processed/sponsor_year_X.parquet"
+  git_tracked: false
+
+panel:
+  grain:
+    - sponsor_id
+    - plan_year
+  sponsor_population: "milestone_3_linked_public_sponsors"
+  plan_year_start: 2015
+  plan_year_end: 2024
+
+frozen_inputs:
+  sponsor_plan_universe:
+    path: "data/processed/sponsor_plan_universe.parquet"
+    expected_rows: 79782
+    expected_unique_sponsors: 11520
+    expected_unique_plans: 13527
+  sponsor_sec_crosswalk:
+    path: "data/processed/sponsor_sec_crosswalk.parquet"
+    expected_sha256: "264FF2DCD22223B654C122B7EE6F69B23CEA71A8885937D976C1BBCF8203D55A"
+    expected_linked_sponsors: 729
+    expected_unique_ciks: 729
+  linked_pension_population:
+    expected_plan_rows: 8950
+    expected_unique_plans: 1294
+    expected_unique_sponsors: 729
+
+data_families:
+  pension:
+    status: "available_from_milestone_2"
+    candidate_fields:
+      - funded_ratio
+      - assets
+      - liabilities
+      - contributions
+      - benefit_payments
+      - participants
+      - pension_size
+
+  sponsor_financials:
+    status: "not_yet_ingested"
+    source_family: "SEC_EDGAR_XBRL"
+    candidate_fields:
+      - total_assets
+      - total_liabilities
+      - debt
+      - cash
+      - revenue
+      - operating_income
+      - profitability
+      - operating_cash_flow
+      - leverage
+      - liquidity
+      - pension_statement_items
+
+  market:
+    status: "not_yet_ingested"
+    candidate_fields:
+      - equity_return
+      - equity_volatility
+      - equity_drawdown
+      - market_capitalization
+
+  macro:
+    status: "not_yet_ingested"
+    candidate_fields:
+      - interest_rates
+      - inflation
+      - credit_conditions
+      - unemployment
+
+pension_aggregation:
+  target_grain: "sponsor_year"
+  monetary_fields:
+    provisional_rule: "sum_across_linked_plans"
+  funded_ratio:
+    provisional_rule: "sum_assets_divided_by_sum_liabilities"
+    require_positive_liabilities: true
+  participants:
+    provisional_rule: "sum_across_linked_plans_with_overlap_audit"
+  pension_size:
+    status: "definition_pending_financial_denominator_review"
+  final_policy_status: "must_be_validated_before_panel_finalization"
+
+temporal_integrity:
+  required_columns:
+    - information_date
+    - forecast_cutoff
+  governing_rule: "information_date <= forecast_cutoff"
+  future_information_allowed: false
+  forward_fill_from_future_allowed: false
+  retrospective_value_substitution_allowed: false
+  forecast_cutoff_policy:
+    status: "pending_step_4_1_freeze"
+    rule: null
+
+missingness:
+  silent_zero_fill_allowed: false
+  future_backfill_allowed: false
+  imputation_policy_status: "not_selected_at_step_4_0"
+
+scientific_controls:
+  outcome_data_may_define_features: false
+  final_holdout_may_define_features: false
+  post_outcome_information_allowed: false
+  raw_source_provenance_required: true
+  transformation_version_required: true
+
+step_4_0_acceptance:
+  milestone_3_release_verified: true
+  crosswalk_hash_verified: true
+  linked_population_reconciled: true
+  structured_x_contract_frozen: true
+  forecast_cutoff_policy_frozen: false
+  structured_x_constructed: false
+
+next_step:
+  id: "4.1"
+  name: "freeze_forecast_cutoff_and_build_pension_sponsor_year_base"
