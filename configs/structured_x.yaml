@@ -1,20 +1,31 @@
-version: "4.0.0"
+version: "4.1.0"
 milestone: 4
-step: "4.0"
-status: "step_4_0_contract_frozen"
+step: "4.1"
+status: "step_4_1_pension_base_frozen"
 
 description: >
   Structured sponsor-year information set X(i,t) integrating pension,
   sponsor-financial, market, and prespecified macro information under
-  explicit information-date controls.
+  explicit point-in-time information-date controls.
 
 release:
   base_tag: "v0.4.0-entity-linkage"
   target_tag: "v0.5.0-structured-panel"
+  target_tag_created: false
 
 primary_artifact:
   path: "data/processed/sponsor_year_X.parquet"
   git_tracked: false
+  status: "not_yet_constructed"
+
+step_4_1_artifact:
+  path: "data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet"
+  git_tracked: false
+  expected_rows: 5934
+  expected_unique_sponsors: 729
+  grain:
+    - sponsor_id
+    - plan_year
 
 panel:
   grain:
@@ -27,6 +38,7 @@ panel:
 frozen_inputs:
   sponsor_plan_universe:
     path: "data/processed/sponsor_plan_universe.parquet"
+    expected_sha256: "ED22F81E6F6E407F0494CDBB94AB6D8FA84B9CF576C637D02E20A013735E6255"
     expected_rows: 79782
     expected_unique_sponsors: 11520
     expected_unique_plans: 13527
@@ -39,21 +51,22 @@ frozen_inputs:
     expected_plan_rows: 8950
     expected_unique_plans: 1294
     expected_unique_sponsors: 729
+    expected_unique_sponsor_years: 5934
 
 data_families:
   pension:
-    status: "available_from_milestone_2"
-    candidate_fields:
+    status: "step_4_1_base_constructed"
+    fields:
       - funded_ratio
       - assets
       - liabilities
       - contributions
       - benefit_payments
       - participants
-      - pension_size
+    pension_size_status: "pending_sponsor_financial_denominator_review"
 
   sponsor_financials:
-    status: "not_yet_ingested"
+    status: "next_step_4_2"
     source_family: "SEC_EDGAR_XBRL"
     candidate_fields:
       - total_assets
@@ -86,16 +99,22 @@ data_families:
 
 pension_aggregation:
   target_grain: "sponsor_year"
+  temporal_eligibility_rule: "plan information_date <= sponsor-year forecast_cutoff"
   monetary_fields:
-    provisional_rule: "sum_across_linked_plans"
+    rule: "sum_across_available_plans_if_field_complete_within_available_set"
+    partial_sum_if_available_plan_field_missing: false
   funded_ratio:
-    provisional_rule: "sum_assets_divided_by_sum_liabilities"
+    rule: "aggregate_assets_divided_by_aggregate_liabilities"
     require_positive_liabilities: true
+    unweighted_plan_ratio_mean_allowed: false
   participants:
-    provisional_rule: "sum_across_linked_plans_with_overlap_audit"
+    rule: "sum_across_available_plans_if_field_complete_within_available_set"
+    overlap_audit_required: true
+    overlap_risk_flag: "participants_overlap_risk"
+  source_provenance:
+    available_plan_source_files_retained: true
   pension_size:
-    status: "definition_pending_financial_denominator_review"
-  final_policy_status: "must_be_validated_before_panel_finalization"
+    status: "definition_pending_sponsor_financial_denominator_review"
 
 temporal_integrity:
   required_columns:
@@ -106,18 +125,36 @@ temporal_integrity:
   forward_fill_from_future_allowed: false
   retrospective_value_substitution_allowed: false
   forecast_cutoff_policy:
-    status: "pending_step_4_1_freeze"
-    rule: null
+    status: "frozen_step_4_1"
+    policy_id: "OCTOBER_15_T_PLUS_1"
+    rule: "October 15 of calendar year t+1"
+    plan_year_reference: "t"
+    month: 10
+    day: 15
+    common_across_sponsors_within_plan_year: true
+    outcome_independent: true
+    candidate_cutoff_diagnostics_required: true
+    candidate_policy_ids:
+      - "JULY_31_T_PLUS_1"
+      - "SEPTEMBER_30_T_PLUS_1"
+      - "OCTOBER_15_T_PLUS_1"
+      - "DECEMBER_31_T_PLUS_1"
+  analytical_availability:
+    late_plan_filings_excluded: true
+    missing_information_date_excluded: true
+    sponsor_year_skeleton_retained_when_no_plan_is_available: true
 
 missingness:
   silent_zero_fill_allowed: false
   future_backfill_allowed: false
-  imputation_policy_status: "not_selected_at_step_4_0"
+  partial_plan_sum_when_available_field_missing: false
+  step_4_1_missingness_audit_required: true
+  final_imputation_policy_status: "not_selected"
 
 scientific_controls:
   outcome_data_may_define_features: false
   final_holdout_may_define_features: false
-  post_outcome_information_allowed: false
+  post_cutoff_information_allowed: false
   raw_source_provenance_required: true
   transformation_version_required: true
 
@@ -129,6 +166,18 @@ step_4_0_acceptance:
   forecast_cutoff_policy_frozen: false
   structured_x_constructed: false
 
+step_4_1_acceptance:
+  forecast_cutoff_policy_frozen: true
+  pension_sponsor_year_base_constructed: true
+  expected_sponsor_year_rows_verified: true
+  deterministic_multi_plan_aggregation_verified: true
+  temporal_integrity_verified: true
+  duplicate_audit_verified: true
+  missingness_audit_verified: true
+  aggregation_identity_audit_verified: true
+  interim_parquet_git_tracked: false
+  step_4_1_status: "PASS"
+
 next_step:
-  id: "4.1"
-  name: "freeze_forecast_cutoff_and_build_pension_sponsor_year_base"
+  id: "4.2"
+  name: "ingest_and_align_point_in_time_sec_xbrl_sponsor_financials"

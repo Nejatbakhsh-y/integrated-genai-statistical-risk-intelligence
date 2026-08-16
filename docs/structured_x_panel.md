@@ -2,160 +2,122 @@
 
 ## Status
 
-Step 4.0 establishes the input and governance contract for the structured
-sponsor-year information set `X(i,t)`.
+Milestone 4 remains in progress. Step 4.1 freezes the pension point-in-time
+forecast cutoff and constructs the audited sponsor-year pension base. The final
+multi-family structured panel is not yet complete and the release tag
+`v0.5.0-structured-panel` must not be created at this step.
 
-Target release:
-
-`v0.5.0-structured-panel`
-
-Target local analytical artifact:
+Target final local analytical artifact:
 
 `data/processed/sponsor_year_X.parquet`
 
-The Parquet artifact remains local and is not committed to Git.
+Step-4.1 local interim artifact:
+
+`data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet`
+
+Both Parquet artifacts are local-only and must not be tracked in Git.
 
 ## Frozen Upstream Handoff
 
-Milestone 4 starts from:
+Milestone 4 starts from `v0.4.0-entity-linkage` and the frozen sponsor-to-SEC
+crosswalk.
 
-`v0.4.0-entity-linkage`
-
-The frozen final sponsor-to-SEC crosswalk contains 729 linked public-company
-sponsors and 729 unique SEC CIKs.
-
-Frozen crosswalk SHA-256:
+Crosswalk SHA-256:
 
 `264FF2DCD22223B654C122B7EE6F69B23CEA71A8885937D976C1BBCF8203D55A`
 
-The linked pension population contains:
+Sponsor-plan universe SHA-256 used by Step 4.1:
+
+`ED22F81E6F6E407F0494CDBB94AB6D8FA84B9CF576C637D02E20A013735E6255`
+
+Frozen linked pension population:
 
 - 729 linked sponsors;
 - 1,294 linked pension plans;
 - 8,950 linked plan-year observations;
+- 5,934 sponsor-year observations;
 - plan years 2015 through 2024.
 
-## Target Observation
+## Step-4.1 Forecast Cutoff
 
-The final structured panel grain is:
+The Step-4.1 point-in-time policy is frozen as:
 
-`sponsor_id x plan_year`
+`forecast_cutoff(i,t) = October 15 of calendar year t+1`
 
-Multiple pension plans belonging to the same sponsor-year therefore require
-explicit aggregation before sponsor financial, market, and macro variables are
-joined.
+The policy is common across sponsors for a given plan year and is fixed before
+model fitting or holdout evaluation. It is not selected using outcomes.
 
-## Structured Information Families
-
-### Pension
-
-Candidate information includes:
-
-- funded ratio;
-- assets;
-- liabilities;
-- contributions;
-- benefit payments;
-- participants;
-- pension size.
-
-The provisional funded-ratio aggregation is the ratio of aggregate sponsor-year
-assets to aggregate sponsor-year liabilities, rather than an unweighted mean of
-plan-level funded ratios.
-
-### Sponsor Financials
-
-SEC/EDGAR/XBRL information will include prespecified variables from the
-financial statements and related pension disclosures, subject to historical
-availability and temporal controls.
-
-Candidate classes include:
-
-- assets;
-- liabilities;
-- debt;
-- cash;
-- revenue;
-- operating income;
-- profitability;
-- cash flow;
-- leverage;
-- liquidity;
-- relevant pension statement items.
-
-### Market
-
-Candidate market information includes:
-
-- equity return;
-- volatility;
-- drawdown;
-- market capitalization.
-
-### Macro
-
-Candidate macroeconomic controls include:
-
-- interest rates;
-- inflation;
-- credit conditions;
-- unemployment.
-
-The final variable set must be frozen before final modeling and must not be
-selected using future holdout outcomes.
-
-## Temporal Integrity
-
-Every final sponsor-year observation must retain:
-
-`information_date`
-
-and:
-
-`forecast_cutoff`
-
-The governing rule is:
+For pension inputs, a plan filing is analytically available only when:
 
 `information_date <= forecast_cutoff`
 
-No future filing, future financial value, revised future pension value,
-post-cutoff market observation, or retrospectively available macro observation
-may enter `X(i,t)`.
+A filing with a missing information date or an information date after the
+cutoff does not enter the point-in-time pension aggregation. The sponsor-year
+skeleton remains present even when no plan filing is available by the cutoff.
 
-Step 4.0 intentionally does not invent the forecast-cutoff calendar convention.
-That policy must be frozen after examining the actual historical filing and
-data-availability structure, before structured sources are integrated.
+Step 4.1 records July 31, September 30, October 15, and December 31 candidate
+availability diagnostics for audit purposes. The frozen policy remains October
+15 of t+1; the diagnostics do not select a policy using model outcomes.
 
-## Missingness
+## Deterministic Pension Aggregation
 
-Step 4.0 prohibits:
+The sponsor-year grain is:
 
-- silent zero filling;
-- future-value backfilling;
-- future-informed imputation.
+`sponsor_id x plan_year`
 
-Missingness and coverage will be reported separately for each data family.
+For each sponsor-year, aggregation uses only filings available by the frozen
+cutoff.
 
-## Step 4.0 Acceptance Gate
+Rules:
 
-Step 4.0 passes only if:
+1. assets, liabilities, contributions, benefit payments, and participants are
+   summed across available plans only when the field is nonmissing for every
+   available plan;
+2. partial field sums are not created when an available plan is missing the
+   field;
+3. funded ratio equals aggregate assets divided by aggregate liabilities;
+4. funded ratio is missing when aggregate liabilities are unavailable or not
+   strictly positive;
+5. the unweighted mean of plan-level funded ratios is prohibited;
+6. participant counts are summed under the provisional Step-4.0 rule and a
+   `participants_overlap_risk` flag identifies sponsor-years with more than one
+   available plan;
+7. source-file provenance for available filings is retained;
+8. pension size remains pending until a sponsor-financial denominator is
+   defined in a later Milestone-4 step.
 
-1. `develop` equals the Milestone-3 release commit;
-2. local and remote `v0.4.0-entity-linkage` resolve to that commit;
-3. the frozen crosswalk hash is unchanged;
-4. the 729 linked sponsors reconcile to the frozen pension universe;
-5. the linked pension population contains 8,950 plan-year rows and
-   1,294 unique plans;
-6. the four structured-data families are explicitly defined;
-7. `information_date` and `forecast_cutoff` are mandatory;
-8. Ruff passes;
-9. Pytest passes;
-10. no Parquet data are staged or committed.
+## Step-4.1 Audit Artifacts
 
-## Step 4.1
+Tracked audit artifacts include:
 
-Step 4.1 will freeze the forecast-cutoff semantics and construct the audited
-pension sponsor-year base before external sponsor-financial, market, or macro
-data are joined.
+- forecast-cutoff diagnostics;
+- sponsor-year temporal-detail audit;
+- pension missingness audit;
+- aggregation-identity audit;
+- pension coverage by plan year;
+- Step-4.1 summary audit JSON.
 
-No final `sponsor_year_X.parquet` is claimed at Step 4.0.
+The interim pension Parquet is explicitly excluded from Git.
+
+## Step-4.1 Acceptance Gate
+
+Step 4.1 passes only if:
+
+1. the feature branch starts from the frozen Step-4.0 commit;
+2. the sponsor-universe and crosswalk hashes match the frozen inputs;
+3. the linked population reconciles to 8,950 plan-year rows, 1,294 plans, 729
+   sponsors, and 5,934 sponsor-years;
+4. the October-15-of-t+1 cutoff is frozen in configuration;
+5. the interim base contains exactly 5,934 unique sponsor-year rows;
+6. `information_date <= forecast_cutoff` has zero violations;
+7. deterministic aggregation identities pass;
+8. duplicate and missingness audits pass;
+9. Ruff and Pytest pass;
+10. no Parquet file is staged or committed;
+11. only Step-4.1 code, configuration, tests, documentation, and audit artifacts
+    are committed.
+
+## Next Step
+
+Step 4.2 will ingest and align point-in-time SEC/EDGAR XBRL sponsor-financial
+variables to the frozen sponsor-year cutoff policy.
