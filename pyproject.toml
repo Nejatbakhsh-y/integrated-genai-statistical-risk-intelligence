@@ -16,6 +16,7 @@ dependencies = [
     "scipy>=1.13",
     "statsmodels>=0.14",
     "scikit-learn>=1.5",
+    "rapidfuzz>=3.14,<4",
     "pyarrow>=17",
     "pydantic>=2.8",
     "PyYAML>=6.0",

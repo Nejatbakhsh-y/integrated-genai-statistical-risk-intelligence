@@ -1,0 +1,20 @@
+{
+  "adjudication_artifact": "data/validation/sponsor_sec_fuzzy_manual_adjudication.csv",
+  "evidence_artifact": "data/validation/sponsor_sec_fuzzy_manual_review_evidence.csv",
+  "fuzzy_auto_accept": false,
+  "input_artifact": "data/validation/sponsor_sec_fuzzy_candidates.parquet",
+  "input_candidate_rows": 2489,
+  "input_sha256": "36EA7992901EA56E54B01AC59F06EC55A995451B697D18231D7B3B356B97E628",
+  "input_sponsors": 2153,
+  "minimum_candidate_score": 90.0,
+  "no_candidate_sponsor_policy": "REMAIN_UNMATCHED",
+  "no_candidate_sponsors_from_step_3_5": 8512,
+  "review_method": "MANUAL_ADJUDICATION",
+  "score_100_candidate_rows": 2,
+  "score_100_requires_manual_review": true,
+  "score_100_sponsors": 2,
+  "score_column": "match_score",
+  "status": "READY_FOR_MANUAL_ADJUDICATION",
+  "step": "3.6",
+  "step_3_7_executed": false
+}

@@ -1,0 +1,19 @@
+{
+  "final_machine_deterministic": 1664,
+  "final_unresolved": 484,
+  "first_pass_machine_deterministic": 1663,
+  "fuzzy_auto_accept": false,
+  "fuzzy_auto_reject": false,
+  "human_decisions_preserved": 5,
+  "input_first_pass_sha256": "85959BAB3ABEFA71C3156B0D364E1B04A437CE2FBC19FCB1EFA70A2A6A09C313",
+  "machine_decisions_labeled_as_human": false,
+  "name_similarity_auto_accept": false,
+  "output_hybrid_sha256": "33E47231D7DA70899EADF01AA286375D5C4A6FBDE0ABFD4BB34C90EAC6299715",
+  "protocol_version": "3.6-hybrid-v1",
+  "remaining_unresolved_sha256": "0A726900EEB7E355DE7B24778E0140220104869565FC80E3E60CB7A2452DC9AC",
+  "score_100_manual_review_complete": true,
+  "second_pass_exact_legal_name_matches": 1,
+  "step": "3.6",
+  "step_3_7_executed": false,
+  "total_sponsors": 2153
+}

@@ -1,0 +1,48 @@
+{
+  "created_utc": "2026-08-16T19:33:56.493302+00:00",
+  "final_crosswalk": {
+    "crosswalk_audit_sha256": "4B21E59780462D55BBD4CA1AC454ACECDAA858A2E8E2B2E09C656D8097D8B95E",
+    "crosswalk_sha256": "264FF2DCD22223B654C122B7EE6F69B23CEA71A8885937D976C1BBCF8203D55A",
+    "linked_sponsors": 729,
+    "rows_in_duplicate_cik_groups": 0,
+    "step_3_4_links": 723,
+    "step_3_6_links": 6,
+    "unique_sec_ciks": 729
+  },
+  "full_disposition": {
+    "linked": 729,
+    "no_qualifying_fuzzy_candidate": 8512,
+    "sha256": "DA4DE423679B7E7DF1BCF28CFEDA80AA0A1E0E93712185F32CCEBEE4007486A4",
+    "step_3_4_manual_review_retained": 132,
+    "step_3_6_supported_no_match": 1663,
+    "step_3_6_unresolved_retained": 484,
+    "total_sponsors": 11520,
+    "unlinked": 10791
+  },
+  "milestone": 3,
+  "policies": {
+    "fuzzy_score_auto_accept": false,
+    "fuzzy_score_auto_reject": false,
+    "step_3_4_manual_review_auto_linked": false,
+    "step_3_6_unresolved_auto_linked": false,
+    "step_3_6_unresolved_reclassified_no_match": false
+  },
+  "source_step_3_4": {
+    "high_confidence_match": 723,
+    "manual_review": 132,
+    "rows": 11520,
+    "sha256": "ED8F048FC260C067E79F7B8E53DED4127D3C56EA2D1CF0758632E8FB2985362E",
+    "unmatched": 10665
+  },
+  "source_step_3_6": {
+    "accepted_matches": 6,
+    "accepted_matches_sha256": "A8883AA5B43CDCB7A926BD2DBC18E27CF9A8C36302298B2F618BACD7902CF069",
+    "final_disposition_sha256": "FD51CA384E12BA2BAAD969163ACCBD35433F351F84B8B4C41891CA7C574D78F2",
+    "no_qualifying_fuzzy_candidate": 8512,
+    "review_population": 2153,
+    "supported_no_match": 1663,
+    "unresolved_retained_unmatched": 484
+  },
+  "status": "PASS",
+  "step": "3.7"
+}

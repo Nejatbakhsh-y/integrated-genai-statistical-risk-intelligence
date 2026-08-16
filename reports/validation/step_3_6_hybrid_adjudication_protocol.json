@@ -1,0 +1,66 @@
+{
+  "amended_design": "HYBRID_HUMAN_AND_DETERMINISTIC_IDENTIFIER_ADJUDICATION",
+  "created_utc": "2026-08-16T19:00:01.922842+00:00",
+  "decision_hierarchy": [
+    {
+      "description": "Existing independently recorded human decisions remain authoritative and immutable.",
+      "priority": 1,
+      "rule": "PRESERVED_HUMAN_ADJUDICATION"
+    },
+    {
+      "description": "Exactly one SEC candidate EIN equals the Form 5500 sponsor EIN encoded by sponsor_id.",
+      "priority": 2,
+      "result": "MATCH",
+      "rule": "EXACT_EIN_IDENTITY"
+    },
+    {
+      "description": "All candidate SEC EINs are available and none equals the Form 5500 sponsor EIN.",
+      "priority": 3,
+      "result": "NO_MATCH",
+      "rule": "ALL_KNOWN_SEC_EINS_DIFFER"
+    },
+    {
+      "description": "Exactly one candidate's SEC API legal registrant name equals the normalized Form 5500 sponsor legal name, and no known candidate SEC EIN contradicts the sponsor EIN for that exact-name candidate.",
+      "priority": 4,
+      "result": "MATCH",
+      "rule": "UNIQUE_EXACT_LEGAL_NAME_NO_CONTRADICTORY_EIN"
+    },
+    {
+      "description": "Any case not satisfying a deterministic rule remains unresolved for targeted adjudication.",
+      "priority": 5,
+      "rule": "UNRESOLVED"
+    }
+  ],
+  "milestone": 3,
+  "original_design": "MANUAL_ADJUDICATION",
+  "population": {
+    "first_pass_machine_deterministic": 1663,
+    "first_pass_unresolved": 485,
+    "human_decisions_completed": 5,
+    "no_candidate_sponsors_remaining_unmatched": 8512,
+    "step_3_6_candidate_rows": 2489,
+    "step_3_6_sponsors": 2153
+  },
+  "prohibited_rules": [
+    "FUZZY_SCORE_AUTO_ACCEPT",
+    "FUZZY_SCORE_AUTO_REJECT",
+    "NAME_SIMILARITY_AUTO_ACCEPT",
+    "MACHINE_DECISION_LABELED_AS_HUMAN",
+    "SCORE_100_MANUAL_REVIEW_BYPASS"
+  ],
+  "protocol_version": "3.6-hybrid-v1",
+  "provenance_policy": {
+    "human_decision_label": "HUMAN",
+    "machine_decision_label": "MACHINE_DETERMINISTIC",
+    "unresolved_label": "UNRESOLVED"
+  },
+  "reason_for_amendment": "The fuzzy review population contains 2,153 sponsors. Five sponsors were independently manually adjudicated, including both score-100 candidates. The remaining population is processed using deterministic secondary identifiers to avoid falsely representing automated decisions as human review.",
+  "score_100_policy": {
+    "auto_accept": false,
+    "manual_review_completed": true,
+    "manual_review_required": true
+  },
+  "step": "3.6",
+  "step_3_7_allowed": false,
+  "step_3_7_gate": "Step 3.7 remains blocked until the remaining unresolved Step 3.6 population has been dispositioned."
+}
