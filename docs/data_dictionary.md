@@ -138,3 +138,17 @@ frozen October-15-of-t+1 cutoff.
 | macro_unemployment_rate | Latest UNRATE available in the cutoff vintage. | percent |
 | macro_unemployment_rate_observation_date | UNRATE observation date selected. | date |
 | macro_transformation_version | Frozen Step-4.4 transformation version. | version |
+
+## Milestone 4 Step 4.5 Final Structured-X Panel
+
+Final local artifact: `data/processed/sponsor_year_X.parquet`
+
+Grain: `sponsor_id x plan_year`; rows: 5,934; sponsors: 729; SEC CIKs: 729; plan years:
+2015-2024. The final artifact is a byte-identical promotion of the frozen Step-4.4 joined
+pension/SEC/market/macro artifact. SHA-256: `6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF`.
+
+The frozen model-feature contract contains 31 fields across four families:
+pension, sponsor financials, market, and macro. Missing values are preserved exactly as they
+exist after the point-in-time family-specific construction steps; Step 4.5 performs no global
+imputation or zero fill. Control and provenance columns are retained in the final Parquet but
+are not automatically model features.

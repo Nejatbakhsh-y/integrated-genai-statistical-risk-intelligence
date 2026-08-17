@@ -1,19 +1,29 @@
-version: 4.4.0
+version: 4.5.0
 milestone: 4
-step: '4.4'
-status: step_4_4_macro_variables_frozen
-description: 'Structured sponsor-year information set X(i,t) integrating pension, sponsor-financial,
-  market, and prespecified macro information under explicit point-in-time information-date controls.
+step: '4.5'
+status: structured_x_panel_frozen
+description: 'Structured sponsor-year information set X(i,t) integrating pension, sponsor-financial, market,
+  and prespecified macro information under explicit point-in-time information-date controls.
 
   '
 release:
   base_tag: v0.4.0-entity-linkage
   target_tag: v0.5.0-structured-panel
   target_tag_created: false
+  release_ready: true
+  release_authorized_by_step_4_5: true
+  release_action_status: pending_step_4_6
 primary_artifact:
   path: data/processed/sponsor_year_X.parquet
   git_tracked: false
-  status: not_yet_constructed
+  status: constructed_and_frozen
+  expected_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  expected_rows: 5934
+  expected_unique_sponsors: 729
+  expected_unique_ciks: 729
+  grain:
+  - sponsor_id
+  - plan_year
 step_4_1_artifact:
   path: data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet
   git_tracked: false
@@ -142,8 +152,8 @@ sponsor_financial_alignment:
   temporal_eligibility_rule: fact filed_date <= sponsor-year forecast_cutoff
   period_end_rule: fact period_end <= sponsor-year forecast_cutoff
   duration_rule: annual duration contexts must span 250 through 450 days inclusive
-  selection_rule: 'Among eligible synonym concepts, select the latest period_end, then the latest
-    filed_date, then the lowest frozen concept-priority rank, then accession number.
+  selection_rule: 'Among eligible synonym concepts, select the latest period_end, then the latest filed_date,
+    then the lowest frozen concept-priority rank, then accession number.
 
     '
   future_backfill_allowed: false
@@ -329,7 +339,7 @@ missingness:
   partial_plan_sum_when_available_field_missing: false
   sec_missingness_preserved: true
   non_usd_sec_facts_preserved_as_missing: true
-  final_imputation_policy_status: not_selected
+  final_imputation_policy_status: raw_missingness_preserved_in_frozen_panel_no_step_4_5_imputation
   market_missingness_preserved: true
   market_future_backfill_allowed: false
   market_zero_fill_allowed: false
@@ -376,8 +386,8 @@ step_4_2_acceptance:
   raw_companyfacts_git_tracked: false
   step_4_2_status: PASS
 next_step:
-  id: '4.5'
-  name: finalize_and_freeze_structured_x_panel
+  id: '4.6'
+  name: merge_develop_and_tag_v0_5_0_structured_panel
 step_4_3_artifacts:
   market_sponsor_year_features:
     path: data/interim/structured_x/step_4_3/market_sponsor_year_features.parquet
@@ -399,8 +409,8 @@ market_alignment:
   price_source_family: YAHOO_FINANCE_CHART_DAILY
   ticker_mapping_source: SEC_CURRENT_TICKER_EXCHANGE_ASSOCIATIONS
   ticker_mapping_role: identifier metadata only; not a model feature
-  ticker_mapping_selection_rule: within CIK sort by shortest SEC ticker, then ticker, then exchange;
-    use first Yahoo-compatible symbol returning USD daily history
+  ticker_mapping_selection_rule: within CIK sort by shortest SEC ticker, then ticker, then exchange; use
+    first Yahoo-compatible symbol returning USD daily history
   price_currency: USD required; non-USD histories remain missing
   forecast_cutoff_rule: latest trading close on or before forecast_cutoff
   return_price_basis: adjusted close
@@ -414,12 +424,12 @@ market_alignment:
   shares_outstanding_concept_priority:
   - dei:EntityCommonStockSharesOutstanding
   - us-gaap:CommonStockSharesOutstanding
-  shares_temporal_rule: latest eligible periodic-filing shares fact with filed_date <= cutoff and
-    period_end <= cutoff
-  market_capitalization_rule: regular market_close multiplied by point-in-time SEC shares normalized
-    to the provider split basis; constructed only for a unique-ticker CIK
-  split_basis_normalization_rule: multiply SEC shares by cumulative provider split ratios after the
-    selected shares period_end; split metadata is unit-normalization provenance only
+  shares_temporal_rule: latest eligible periodic-filing shares fact with filed_date <= cutoff and period_end
+    <= cutoff
+  market_capitalization_rule: regular market_close multiplied by point-in-time SEC shares normalized to
+    the provider split basis; constructed only for a unique-ticker CIK
+  split_basis_normalization_rule: multiply SEC shares by cumulative provider split ratios after the selected
+    shares period_end; split metadata is unit-normalization provenance only
   future_price_backfill_allowed: false
   future_share_filing_backfill_allowed: false
   manual_ticker_inference_allowed: false
@@ -466,11 +476,11 @@ macro_alignment:
   interest_rate_series: DGS10
   interest_rate_definition: 10-year U.S. Treasury constant-maturity market yield, percent
   inflation_series: CPIAUCNS
-  inflation_definition: 100 * (latest CPI level / same-month prior-year CPI level - 1) within the
-    same ALFRED cutoff vintage
+  inflation_definition: 100 * (latest CPI level / same-month prior-year CPI level - 1) within the same
+    ALFRED cutoff vintage
   credit_conditions_series: NFCI
-  credit_conditions_definition: Chicago Fed National Financial Conditions Index; positive is tighter
-    than average
+  credit_conditions_definition: Chicago Fed National Financial Conditions Index; positive is tighter than
+    average
   unemployment_series: UNRATE
   unemployment_definition: U-3 unemployment rate, percent, seasonally adjusted
   future_vintage_backfill_allowed: false
@@ -493,3 +503,85 @@ step_4_4_acceptance:
   interim_parquet_git_tracked: false
   raw_macro_data_git_tracked: false
   step_4_4_status: PASS
+final_panel:
+  transformation_version: 4.5.0
+  construction_rule: byte-for-byte promotion of the frozen Step-4.4 joined pension/SEC/market/macro artifact;
+    no Step-4.5 value transformation
+  source_artifact: data/interim/structured_x/step_4_4/pension_sec_market_macro_sponsor_year_base.parquet
+  source_artifact_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  final_artifact_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  byte_identical_to_step_4_4_joined: true
+  rows: 5934
+  unique_sponsors: 729
+  unique_ciks: 729
+  model_feature_count: 31
+  model_feature_families:
+    pension:
+    - funded_ratio
+    - assets
+    - liabilities
+    - contributions
+    - benefit_payments
+    - participants
+    - pension_size
+    - pension_assets_to_sponsor_assets
+    - pension_liabilities_to_sponsor_assets
+    - pension_contributions_to_revenue
+    sponsor_financials:
+    - sec_total_assets
+    - sec_total_liabilities
+    - sec_debt
+    - sec_cash
+    - sec_revenue
+    - sec_operating_income
+    - sec_operating_cash_flow
+    - sec_profitability
+    - sec_leverage
+    - sec_liquidity
+    - sec_pension_plan_assets
+    - sec_pension_projected_benefit_obligation
+    - sec_pension_employer_contributions
+    market:
+    - market_equity_return
+    - market_equity_volatility
+    - market_equity_drawdown
+    - market_capitalization
+    macro:
+    - macro_interest_rate_10y
+    - macro_inflation_yoy
+    - macro_credit_conditions_nfci
+    - macro_unemployment_rate
+  missingness_preserved: true
+  step_4_5_imputation_applied: false
+  forecast_cutoff_policy: OCTOBER_15_T_PLUS_1
+  temporal_violation_count: 0
+step_4_5_artifacts:
+  final_structured_x_panel:
+    path: data/processed/sponsor_year_X.parquet
+    git_tracked: false
+    expected_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+    grain:
+    - sponsor_id
+    - plan_year
+  final_panel_audit:
+    path: reports/validation/milestone4_step_4_5_final_panel_audit.json
+    git_tracked: true
+step_4_5_acceptance:
+  step_4_4_artifact_hash_verified: true
+  all_four_data_families_complete: true
+  final_artifact_materialized: true
+  final_artifact_byte_identical_to_step_4_4_joined: true
+  expected_sponsor_year_rows_verified: true
+  expected_unique_sponsors_verified: true
+  expected_unique_ciks_verified: true
+  duplicate_audit_verified: true
+  temporal_integrity_verified: true
+  missingness_preserved: true
+  step_4_5_imputation_applied: false
+  final_parquet_git_tracked: false
+  release_ready: true
+  release_executed: false
+  step_4_5_status: PASS

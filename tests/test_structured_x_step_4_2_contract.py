@@ -67,7 +67,10 @@ def test_step_4_2_financial_family_remains_complete_as_panel_advances() -> None:
         "next_step_4_3",
         "step_4_3_complete",
     }
-    assert config["primary_artifact"]["status"] == "not_yet_constructed"
+    assert config["primary_artifact"]["status"] in {
+        "not_yet_constructed",
+        "constructed_and_frozen",
+    }
     assert config["release"]["target_tag_created"] is False
 
 

@@ -266,3 +266,40 @@ raw macro snapshot or Parquet artifact enters Git.
 Step 4.5 will finalize and freeze the complete structured-X panel, perform the final
 multi-family completeness and provenance gates, materialize the local final analytical
 artifact, and only then determine whether the Milestone-4 release can be merged and tagged.
+
+## Step-4.5 Final Structured-X Freeze
+
+Step 4.5 promotes the frozen Step-4.4 pension/SEC/market/macro joined artifact to the final
+local analytical artifact:
+
+`data/processed/sponsor_year_X.parquet`
+
+The promotion is byte-for-byte. Step 4.5 performs no value transformation and no imputation.
+The final artifact therefore has the same SHA-256 as the frozen Step-4.4 joined artifact:
+
+`6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF`
+
+Final gates verify 5,934 sponsor-year rows, 729 sponsors, 729 SEC CIKs, plan years 2015-2024,
+zero duplicate sponsor-years, the frozen October-15-of-t+1 cutoff, zero detected temporal
+violations across retained provenance dates, and the presence of all four structured-X families.
+The final feature contract contains 31 prespecified model features.
+
+Raw, interim, and final Parquet data remain local-only and are excluded from Git. Tracked
+Step-4.5 evidence consists only of code, configuration, tests, documentation, and audit reports.
+
+Step 4.5 authorizes but does not execute the Milestone-4 release. The feature branch is not
+merged into `develop` and `v0.5.0-structured-panel` is not created until the separate controlled
+Step-4.6 release operation.
+
+## Step-4.5 Acceptance Gate
+
+Step 4.5 passes only if the Step-4.4 joined-artifact hash is unchanged; all upstream Step-4.1
+through Step-4.4 audits remain PASS; the final artifact is byte-identical to the Step-4.4
+joined artifact; grain, temporal-integrity, feature-family, missingness, Ruff, Pytest, Git diff,
+and Git data-safety gates pass; and the release remains unexecuted.
+
+## Next Step
+
+Step 4.6 will merge the fully frozen Milestone-4 feature branch into `develop`, verify the
+post-merge repository state, and create/push `v0.5.0-structured-panel` only if every release
+gate remains satisfied.
