@@ -2,7 +2,7 @@
 
 ## Status
 
-Milestone 4 remains in progress. Step 4.2 ingests and aligns annual SEC/EDGAR XBRL sponsor-financial information to the forecast cutoff frozen in Step 4.1. The final multi-family structured panel is not yet complete, and the release tag `v0.5.0-structured-panel` must not be created at this step.
+Milestone 4 remains in progress. Step 4.3 ingests and aligns point-in-time market variables to the same frozen sponsor-year forecast cutoff. The final multi-family structured panel is not yet complete, and the release tag `v0.5.0-structured-panel` must not be created at this step.
 
 Target final local analytical artifact:
 
@@ -146,6 +146,70 @@ Step 4.2 passes only if:
 11. no raw SEC JSON or Parquet file is staged or committed;
 12. only Step-4.2 code, configuration, tests, documentation, and tracked audit artifacts are committed.
 
+## Step-4.3 Point-in-Time Market Variables
+
+Step 4.3 preserves the 5,934-row `sponsor_id x plan_year` skeleton and the frozen
+October-15-of-t+1 cutoff. It uses SEC ticker/exchange associations only as entity-resolution
+metadata and does not expose ticker or exchange status as a model feature. The SEC notes that
+its ticker-association files are periodically updated and are not guaranteed for accuracy or
+scope; unresolved sponsors therefore remain missing rather than receiving inferred historical
+tickers.
+
+Daily USD equity history is retrieved from the Yahoo Finance chart feed and cached locally
+under `data/raw/market/yahoo_finance/`. Raw market files are not committed. For each
+sponsor-year, the last trading close on or before `forecast_cutoff` is the as-of price. A
+trailing window requires 253 observations, yielding exactly 252 daily return intervals.
+Regular close is retained for market capitalization; adjusted close is used for return,
+volatility, and drawdown. Because the provider presents historical prices on a split-normalized
+basis, SEC shares are multiplied by cumulative split ratios after the selected shares period
+end before market capitalization is computed. Split metadata is retained only as unit
+normalization provenance, not as a predictive feature.
+
+Frozen Step-4.3 features are:
+
+- `market_equity_return`: adjusted close at the cutoff divided by adjusted close 252 trading
+  intervals earlier, minus one;
+- `market_equity_volatility`: annualized standard deviation of the 252 adjusted-close daily
+  log returns, using `sqrt(252)` annualization;
+- `market_equity_drawdown`: minimum adjusted-close/running-peak minus one over the same
+  window;
+- `market_capitalization`: regular cutoff close multiplied by the latest eligible SEC shares
+  normalized to the provider split basis, only when the CIK has one ticker association.
+
+The shares-outstanding hierarchy is `dei:EntityCommonStockSharesOutstanding` followed by
+`us-gaap:CommonStockSharesOutstanding`. No post-cutoff price or filing may enter an earlier
+sponsor-year. Missing ticker associations, price histories, short price windows, or eligible
+share facts remain missing; there is no zero fill, future backfill, or manual ticker inference.
+
+Step-4.3 audit results:
+
+- target CIKs: 729;
+- CIKs with SEC ticker association: 450;
+- CIKs with usable USD Yahoo Finance history: 450;
+- sponsor-year rows: 5934;
+- temporal violations: 0;
+- equity-return nonmissing: 3862;
+- equity-volatility nonmissing: 3862;
+- equity-drawdown nonmissing: 3862;
+- market-capitalization nonmissing: 3211.
+
+Local Step-4.3 artifacts:
+
+- `data/interim/structured_x/step_4_3/market_sponsor_year_features.parquet`;
+- `data/interim/structured_x/step_4_3/pension_sec_market_sponsor_year_base.parquet`.
+
+Both Parquet files are local-only and excluded from Git.
+
+## Step-4.3 Acceptance Gate
+
+Step 4.3 passes only if the frozen Step-4.2 artifact hash is unchanged; the SEC ticker
+reference and Yahoo Finance histories are provenance-audited; market features use only observations
+available by each cutoff; the 5,934-row sponsor-year grain is preserved; temporal violations
+are zero; missingness is retained; Ruff, Pytest, and Git diff gates pass; and neither raw
+market files nor Parquet artifacts enter Git.
+
 ## Next Step
 
-Step 4.3 will ingest and align point-in-time market variables while preserving the same 5,934-row sponsor-year grain and frozen forecast cutoff. Milestone 4 remains incomplete until the remaining structured-X families and final panel gates are complete.
+Step 4.4 will ingest and align point-in-time macro variables while preserving the same
+5,934-row sponsor-year grain and frozen forecast cutoff. Milestone 4 remains incomplete until
+macro integration and the final structured-X panel gates are complete.

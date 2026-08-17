@@ -71,3 +71,44 @@ The grain remains `sponsor_id x plan_year`. SEC facts are eligible only when the
 | sec_transformation_version | Frozen transformation version for Step 4.2. | version |
 
 For each base SEC metric, provenance columns retain the selected taxonomy, concept, period start, period end, filing date, annual form, accession number, reporting unit, and deterministic candidate-priority rank.
+
+## Milestone 4 Step 4.3 Market Variables
+
+Local market artifact: `data/interim/structured_x/step_4_3/market_sponsor_year_features.parquet`
+
+Joined local artifact:
+
+`data/interim/structured_x/step_4_3/pension_sec_market_sponsor_year_base.parquet`
+
+The grain remains `sponsor_id x plan_year`. Price observations and SEC shares-outstanding
+facts are eligible only when their relevant information dates are on or before the frozen
+October-15-of-t+1 forecast cutoff.
+
+| Field | Definition | Unit |
+|---|---|---|
+| market_sec_ticker | SEC ticker association used only for source resolution. | identifier |
+| market_sec_exchange | SEC exchange association used only for source resolution. | identifier |
+| market_source_symbol | Yahoo Finance symbol selected for the CIK. | identifier |
+| market_price_provider | Historical price provider retained as provenance. | provenance |
+| market_price_currency | Provider currency; Step 4.3 requires USD. | currency |
+| market_ticker_candidate_count | Number of current SEC ticker associations for the CIK. | count |
+| market_price_information_date | Last trading date on or before forecast cutoff. | date |
+| market_information_date | Latest feature-source information date used by Step 4.3. | date |
+| market_close | Last positive regular close on or before forecast cutoff. | USD/share |
+| market_adjusted_close | Corporate-action-adjusted close on the same trading date. | USD/share |
+| market_window_start_date | First date in the trailing price window. | date |
+| market_window_price_observations | Trailing price count, capped at 253. | count |
+| market_equity_return | Adjusted-close return over 252 intervals when 253 prices exist. | ratio |
+| market_equity_volatility | Annualized adjusted-close log-return volatility. | ratio |
+| market_equity_drawdown | Minimum close/running-peak minus one over the trailing window. | ratio |
+| market_shares_outstanding | Latest eligible SEC common shares outstanding. | shares |
+| market_shares_split_basis_factor | Split-only unit conversion after shares period end. | factor |
+| market_shares_split_adjusted | SEC shares on the provider's split-normalized basis. | shares |
+| market_shares_filed_date | SEC filing date for selected shares-outstanding fact. | date |
+| market_shares_period_end | Period end for selected shares-outstanding fact. | date |
+| market_shares_taxonomy | Taxonomy of selected shares-outstanding fact. | provenance |
+| market_shares_concept | Concept of selected shares-outstanding fact. | provenance |
+| market_shares_form | SEC form of selected shares-outstanding fact. | provenance |
+| market_shares_accession | SEC accession number of selected shares-outstanding fact. | provenance |
+| market_capitalization | Close times split-normalized shares for unique-ticker CIKs. | USD |
+| market_transformation_version | Frozen Step-4.3 transformation version. | version |

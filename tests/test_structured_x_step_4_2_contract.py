@@ -12,12 +12,14 @@ def load_config() -> dict:
     return yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
 
 
-def test_step_4_2_contract_is_frozen() -> None:
+def test_step_4_2_contract_is_preserved_after_later_steps() -> None:
     config = load_config()
-    assert config["version"] == "4.2.0"
-    assert config["step"] == "4.2"
-    assert config["status"] == "step_4_2_sec_financials_frozen"
-    assert config["step_4_2_acceptance"]["step_4_2_status"] == "PASS"
+    acceptance = config["step_4_2_acceptance"]
+    alignment = config["sponsor_financial_alignment"]
+    assert acceptance["step_4_2_status"] == "PASS"
+    assert alignment["transformation_version"] == "4.2.0"
+    assert alignment["future_backfill_allowed"] is False
+    assert alignment["retrospective_restated_value_after_cutoff_allowed"] is False
 
 
 def test_step_4_2_artifacts_preserve_sponsor_year_grain() -> None:
@@ -58,10 +60,13 @@ def test_step_4_2_config_concept_priority_matches_implementation() -> None:
         assert configured[metric] == expected
 
 
-def test_step_4_2_financial_family_is_complete_but_milestone_is_not() -> None:
+def test_step_4_2_financial_family_remains_complete_as_panel_advances() -> None:
     config = load_config()
     assert config["data_families"]["sponsor_financials"]["status"] == "step_4_2_complete"
-    assert config["data_families"]["market"]["status"] == "next_step_4_3"
+    assert config["data_families"]["market"]["status"] in {
+        "next_step_4_3",
+        "step_4_3_complete",
+    }
     assert config["primary_artifact"]["status"] == "not_yet_constructed"
     assert config["release"]["target_tag_created"] is False
 
@@ -76,9 +81,13 @@ def test_step_4_2_pension_size_definition_is_frozen() -> None:
     assert pension_size["require_positive_sec_total_assets"] is True
 
 
-def test_step_4_2_next_step_is_market_alignment() -> None:
+def test_step_4_2_handoff_is_compatible_with_later_milestone_4_steps() -> None:
     config = load_config()
-    assert config["next_step"] == {
-        "id": "4.3",
-        "name": "ingest_and_align_point_in_time_market_variables",
-    }
+    if str(config["step"]) == "4.2":
+        assert config["next_step"] == {
+            "id": "4.3",
+            "name": "ingest_and_align_point_in_time_market_variables",
+        }
+    else:
+        assert config["step_4_2_acceptance"]["step_4_2_status"] == "PASS"
+        assert config["data_families"]["market"]["status"] == "step_4_3_complete"
