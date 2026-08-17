@@ -208,8 +208,61 @@ available by each cutoff; the 5,934-row sponsor-year grain is preserved; tempora
 are zero; missingness is retained; Ruff, Pytest, and Git diff gates pass; and neither raw
 market files nor Parquet artifacts enter Git.
 
+## Step-4.4 Point-in-Time Macro Variables
+
+Step 4.4 preserves the frozen 5,934-row `sponsor_id x plan_year` skeleton and uses an
+ALFRED vintage exactly equal to each sponsor-year `forecast_cutoff`. This prevents a later
+revision from replacing the value that was actually knowable at the historical cutoff.
+ALFRED raw CSV snapshots are cached locally under `data/raw/macro/alfred/` and are excluded
+from Git.
+
+The frozen macro registry is:
+
+- `DGS10` -> `macro_interest_rate_10y`, the 10-year U.S. Treasury constant-maturity yield;
+- `CPIAUCNS` -> `macro_inflation_yoy`, the year-over-year percent change in CPI-U All Items
+  computed from levels inside the same cutoff vintage;
+- `NFCI` -> `macro_credit_conditions_nfci`, the Chicago Fed National Financial Conditions
+  Index, where positive values indicate tighter-than-average financial conditions;
+- `UNRATE` -> `macro_unemployment_rate`, the U-3 unemployment rate.
+
+For each series and each of the ten frozen forecast cutoffs, the automation downloads a
+historical ALFRED graph snapshot with `vintage_date == forecast_cutoff`. The selected
+observation must be on or before the cutoff. Inflation uses the latest available CPI level and
+the same calendar month one year earlier from that same vintage. No later vintage, later
+observation, zero fill, or future backfill is allowed.
+
+Step-4.4 audit results:
+
+- unique forecast cutoffs: 10;
+- raw ALFRED snapshot requests: 40;
+- macro year rows: 10;
+- sponsor-year macro rows: 5934;
+- joined sponsor-year rows: 5934;
+- temporal violations: 0;
+- interest-rate nonmissing: 5934;
+- inflation nonmissing: 5934;
+- credit-conditions nonmissing: 5934;
+- unemployment nonmissing: 5934.
+
+Local Step-4.4 artifacts:
+
+- `data/interim/structured_x/step_4_4/macro_sponsor_year_features.parquet`;
+- `data/interim/structured_x/step_4_4/pension_sec_market_macro_sponsor_year_base.parquet`.
+
+Both Parquet files are local-only and excluded from Git. Step 4.4 completes the ingestion of
+all four structured-X information families, but it does not yet create the final release
+artifact or the `v0.5.0-structured-panel` tag.
+
+## Step-4.4 Acceptance Gate
+
+Step 4.4 passes only if the frozen Step-4.3 joined-artifact hash is unchanged; all four macro
+series are retrieved from cutoff-specific ALFRED vintages; every selected observation is on
+or before its forecast cutoff; the 5,934-row sponsor-year grain is preserved; temporal
+violations are zero; missingness is retained; Ruff, Pytest, and Git diff gates pass; and no
+raw macro snapshot or Parquet artifact enters Git.
+
 ## Next Step
 
-Step 4.4 will ingest and align point-in-time macro variables while preserving the same
-5,934-row sponsor-year grain and frozen forecast cutoff. Milestone 4 remains incomplete until
-macro integration and the final structured-X panel gates are complete.
+Step 4.5 will finalize and freeze the complete structured-X panel, perform the final
+multi-family completeness and provenance gates, materialize the local final analytical
+artifact, and only then determine whether the Milestone-4 release can be merged and tagged.

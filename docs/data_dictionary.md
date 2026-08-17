@@ -112,3 +112,29 @@ October-15-of-t+1 forecast cutoff.
 | market_shares_accession | SEC accession number of selected shares-outstanding fact. | provenance |
 | market_capitalization | Close times split-normalized shares for unique-ticker CIKs. | USD |
 | market_transformation_version | Frozen Step-4.3 transformation version. | version |
+
+## Milestone 4 Step 4.4 Macro Variables
+
+Local macro artifact: `data/interim/structured_x/step_4_4/macro_sponsor_year_features.parquet`
+
+Joined local artifact:
+
+`data/interim/structured_x/step_4_4/pension_sec_market_macro_sponsor_year_base.parquet`
+
+The macro values are common across sponsors within a plan year because the forecast cutoff is
+common within plan year. Each value is selected from an ALFRED historical vintage equal to the
+frozen October-15-of-t+1 cutoff.
+
+| Field | Definition | Unit |
+|---|---|---|
+| macro_vintage_date | ALFRED vintage date, exactly equal to forecast cutoff. | date |
+| macro_interest_rate_10y | Latest DGS10 value available in the cutoff vintage. | percent |
+| macro_interest_rate_10y_observation_date | DGS10 observation date selected. | date |
+| macro_inflation_yoy | CPIAUCNS year-over-year change within cutoff vintage. | percent |
+| macro_inflation_observation_date | Latest CPI observation used in inflation. | date |
+| macro_inflation_prior_year_observation_date | Same-month prior-year CPI observation. | date |
+| macro_credit_conditions_nfci | Latest NFCI available in the cutoff vintage. | index |
+| macro_credit_conditions_nfci_observation_date | NFCI observation date selected. | date |
+| macro_unemployment_rate | Latest UNRATE available in the cutoff vintage. | percent |
+| macro_unemployment_rate_observation_date | UNRATE observation date selected. | date |
+| macro_transformation_version | Frozen Step-4.4 transformation version. | version |

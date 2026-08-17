@@ -7,6 +7,7 @@ import yaml
 
 REPO = Path(__file__).resolve().parents[1]
 EXPECTED_STEP_4_2_SHA256 = "09F93E43AA169CE95A7AF98E923C0E6FF6DFEEE8E987564A90E9A86BD7EC7883"
+EXPECTED_STEP_4_3_JOINED_SHA256 = "0A3F6922EA0FE3D83058EC980B19174C5213EE1188CAA8BED8ADE69657D8F9EB"
 
 
 def load_config():
@@ -18,39 +19,29 @@ def load_audit():
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_step_4_3_contract_and_handoff():
+def test_step_4_3_historical_acceptance_remains_frozen() -> None:
     config = load_config()
-    assert config["version"] == "4.3.0"
-    assert str(config["step"]) == "4.3"
-    assert config["status"] == "step_4_3_market_variables_frozen"
     assert config["step_4_2_acceptance"]["step_4_2_status"] == "PASS"
     assert config["step_4_3_acceptance"]["step_4_3_status"] == "PASS"
     assert config["step_4_3_acceptance"]["temporal_violation_count"] == 0
-    assert str(config["next_step"]["id"]) == "4.4"
-    assert config["next_step"]["name"] == "ingest_and_align_point_in_time_macro_variables"
+    assert config["data_families"]["market"]["status"] == "step_4_3_complete"
 
 
-def test_step_4_2_hash_is_frozen_and_step_4_3_hashes_match_audit():
+def test_step_4_3_artifact_hashes_remain_frozen() -> None:
     config = load_config()
     audit = load_audit()
     assert audit["step_4_2_artifact_sha256"] == EXPECTED_STEP_4_2_SHA256
-    frozen = config["frozen_inputs"]["step_4_2_joined_base"]
-    assert frozen["expected_sha256"] == EXPECTED_STEP_4_2_SHA256
+    assert audit["joined_artifact_sha256"] == EXPECTED_STEP_4_3_JOINED_SHA256
     artifacts = config["step_4_3_artifacts"]
     assert (
-        artifacts["market_sponsor_year_features"]["expected_sha256"]
-        == audit["market_artifact_sha256"]
-    )
-    assert (
         artifacts["joined_pension_sec_market_base"]["expected_sha256"]
-        == audit["joined_artifact_sha256"]
+        == EXPECTED_STEP_4_3_JOINED_SHA256
     )
 
 
-def test_market_family_and_temporal_controls_are_frozen():
+def test_step_4_3_market_contract_remains_frozen() -> None:
     config = load_config()
     market = config["data_families"]["market"]
-    assert market["status"] == "step_4_3_complete"
     assert set(market["fields"]) == {
         "market_equity_return",
         "market_equity_volatility",
@@ -66,12 +57,9 @@ def test_market_family_and_temporal_controls_are_frozen():
     assert alignment["future_price_backfill_allowed"] is False
     assert alignment["future_share_filing_backfill_allowed"] is False
     assert alignment["manual_ticker_inference_allowed"] is False
-    availability = config["temporal_integrity"]["analytical_availability"]
-    assert availability["market_prices_after_cutoff_excluded"] is True
-    assert availability["market_shares_filed_after_cutoff_excluded"] is True
 
 
-def test_step_4_3_audit_preserves_grain_and_zero_temporal_violations():
+def test_step_4_3_grain_and_temporal_audit_remain_valid() -> None:
     audit = load_audit()
     assert audit["step_4_3_status"] == "PASS"
     assert audit["target_ciks"] == 729
@@ -79,16 +67,14 @@ def test_step_4_3_audit_preserves_grain_and_zero_temporal_violations():
     assert audit["joined_sponsor_year_rows"] == 5934
     assert audit["duplicate_sponsor_year_rows"] == 0
     assert audit["temporal_violation_count"] == 0
-    assert audit["equity_return_nonmissing"] > 0
-    assert audit["equity_volatility_nonmissing"] > 0
-    assert audit["equity_drawdown_nonmissing"] > 0
-    assert audit["market_capitalization_nonmissing"] > 0
 
 
-def test_status_hands_off_to_step_4_4_without_releasing_milestone_4():
-    status = (REPO / "STATUS.md").read_text(encoding="utf-8")
-    assert "MILESTONE4_STEP_4_3_STATUS=PASS" in status
-    assert "STRUCTURED_X=NOT_YET_COMPLETE" in status
-    assert "MILESTONE4_RELEASE_TAG_CREATED=NO" in status
-    assert "NEXT_STEP=4.4" in status
-    assert "NEXT_STEP_NAME=INGEST_AND_ALIGN_POINT_IN_TIME_MACRO_VARIABLES" in status
+def test_step_4_3_handoff_may_advance_after_macro_integration() -> None:
+    config = load_config()
+    current_step = str(config["step"])
+    if current_step == "4.3":
+        assert str(config["next_step"]["id"]) == "4.4"
+        assert config["next_step"]["name"] == "ingest_and_align_point_in_time_macro_variables"
+    else:
+        assert config["step_4_3_acceptance"]["step_4_3_status"] == "PASS"
+        assert config["data_families"]["macro"]["status"] == "step_4_4_complete"

@@ -1,7 +1,7 @@
-version: 4.3.0
+version: 4.4.0
 milestone: 4
-step: '4.3'
-status: step_4_3_market_variables_frozen
+step: '4.4'
+status: step_4_4_macro_variables_frozen
 description: 'Structured sponsor-year information set X(i,t) integrating pension, sponsor-financial,
   market, and prespecified macro information under explicit point-in-time information-date controls.
 
@@ -75,6 +75,12 @@ frozen_inputs:
     expected_rows: 5934
     expected_unique_sponsors: 729
     expected_unique_ciks: 729
+  step_4_3_joined_base:
+    path: data/interim/structured_x/step_4_3/pension_sec_market_sponsor_year_base.parquet
+    expected_sha256: 0A3F6922EA0FE3D83058EC980B19174C5213EE1188CAA8BED8ADE69657D8F9EB
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
 raw_source_provenance:
   sec_companyfacts:
     source_family: SEC_EDGAR_XBRL_COMPANYFACTS
@@ -105,6 +111,20 @@ raw_source_provenance:
     manifest: reports/validation/milestone4_step_4_3_market_raw_manifest.csv
     required_currency: USD
     ciks_with_usable_price_history: 450
+  alfred_macro_vintages:
+    source_family: ALFRED_VINTAGE_GRAPH_CSV
+    endpoint: https://alfred.stlouisfed.org/graph/alfredgraph.csv
+    authentication_required: false
+    local_raw_directory: data/raw/macro/alfred
+    git_tracked: false
+    manifest: reports/validation/milestone4_step_4_4_macro_raw_manifest.csv
+    unique_forecast_cutoffs: 10
+    raw_snapshot_requests: 40
+    series_ids:
+    - DGS10
+    - CPIAUCNS
+    - NFCI
+    - UNRATE
 sponsor_financial_alignment:
   transformation_version: 4.2.0
   source_family: SEC_EDGAR_XBRL
@@ -229,12 +249,22 @@ data_families:
     - market_source_symbol
     raw_missingness_preserved: true
   macro:
-    status: next_step_4_4
-    candidate_fields:
-    - interest_rates
-    - inflation
-    - credit_conditions
-    - unemployment
+    status: step_4_4_complete
+    source_family: ALFRED_VINTAGE_GRAPH_CSV
+    fields:
+    - macro_interest_rate_10y
+    - macro_inflation_yoy
+    - macro_credit_conditions_nfci
+    - macro_unemployment_rate
+    supporting_fields:
+    - macro_vintage_date
+    - macro_interest_rate_10y_observation_date
+    - macro_inflation_observation_date
+    - macro_inflation_prior_year_observation_date
+    - macro_credit_conditions_nfci_observation_date
+    - macro_unemployment_rate_observation_date
+    - macro_transformation_version
+    raw_missingness_preserved: true
 pension_aggregation:
   target_grain: sponsor_year
   temporal_eligibility_rule: plan information_date <= sponsor-year forecast_cutoff
@@ -289,6 +319,10 @@ temporal_integrity:
     market_shares_filed_after_cutoff_excluded: true
     sponsor_year_retained_when_market_data_missing: true
     current_ticker_metadata_used_as_model_feature: false
+    macro_vintage_after_cutoff_excluded: true
+    macro_observations_after_cutoff_excluded: true
+    sponsor_year_retained_when_macro_data_missing: true
+    retrospective_macro_revision_after_cutoff_allowed: false
 missingness:
   silent_zero_fill_allowed: false
   future_backfill_allowed: false
@@ -299,6 +333,9 @@ missingness:
   market_missingness_preserved: true
   market_future_backfill_allowed: false
   market_zero_fill_allowed: false
+  macro_missingness_preserved: true
+  macro_future_backfill_allowed: false
+  macro_zero_fill_allowed: false
 scientific_controls:
   outcome_data_may_define_features: false
   final_holdout_may_define_features: false
@@ -339,8 +376,8 @@ step_4_2_acceptance:
   raw_companyfacts_git_tracked: false
   step_4_2_status: PASS
 next_step:
-  id: '4.4'
-  name: ingest_and_align_point_in_time_macro_variables
+  id: '4.5'
+  name: finalize_and_freeze_structured_x_panel
 step_4_3_artifacts:
   market_sponsor_year_features:
     path: data/interim/structured_x/step_4_3/market_sponsor_year_features.parquet
@@ -404,3 +441,55 @@ step_4_3_acceptance:
   interim_parquet_git_tracked: false
   raw_market_data_git_tracked: false
   step_4_3_status: PASS
+step_4_4_artifacts:
+  macro_sponsor_year_features:
+    path: data/interim/structured_x/step_4_4/macro_sponsor_year_features.parquet
+    git_tracked: false
+    expected_sha256: 99D8B48E8AC061110980D27D51549E8B7881970676E23CEEE5979E8CD38E2EE9
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  joined_pension_sec_market_macro_base:
+    path: data/interim/structured_x/step_4_4/pension_sec_market_macro_sponsor_year_base.parquet
+    git_tracked: false
+    expected_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+    expected_rows: 5934
+    grain:
+    - sponsor_id
+    - plan_year
+macro_alignment:
+  transformation_version: 4.4.0
+  source_family: ALFRED_VINTAGE_GRAPH_CSV
+  source_role: historical real-time macro snapshot
+  vintage_date_rule: vintage_date == forecast_cutoff
+  observation_rule: latest valid observation on or before forecast_cutoff
+  interest_rate_series: DGS10
+  interest_rate_definition: 10-year U.S. Treasury constant-maturity market yield, percent
+  inflation_series: CPIAUCNS
+  inflation_definition: 100 * (latest CPI level / same-month prior-year CPI level - 1) within the
+    same ALFRED cutoff vintage
+  credit_conditions_series: NFCI
+  credit_conditions_definition: Chicago Fed National Financial Conditions Index; positive is tighter
+    than average
+  unemployment_series: UNRATE
+  unemployment_definition: U-3 unemployment rate, percent, seasonally adjusted
+  future_vintage_backfill_allowed: false
+  future_observation_backfill_allowed: false
+  retrospective_revision_after_cutoff_allowed: false
+  silent_zero_fill_allowed: false
+  raw_missingness_preserved: true
+step_4_4_acceptance:
+  step_4_3_artifact_hash_verified: true
+  unique_forecast_cutoffs: 10
+  alfred_vintage_snapshots_ingested: true
+  macro_series_registry_frozen: true
+  point_in_time_vintage_alignment_verified: true
+  point_in_time_observation_alignment_verified: true
+  temporal_integrity_verified: true
+  temporal_violation_count: 0
+  sponsor_year_grain_preserved: true
+  expected_sponsor_year_rows_verified: true
+  missingness_preserved: true
+  interim_parquet_git_tracked: false
+  raw_macro_data_git_tracked: false
+  step_4_4_status: PASS
