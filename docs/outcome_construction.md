@@ -131,3 +131,82 @@ Merge the frozen Milestone-5 branch into `develop` and create:
 `v0.6.0-outcomes`
 
 only after all Milestone-5 acceptance gates pass.
+
+
+## Step 5.1 - Continuous Outcome Panel
+
+Status: PASS.
+
+The continuous one-year-ahead outcome panel was constructed from the frozen
+Step-4.1 pension sponsor-year base.
+
+Input pension-base SHA-256:
+
+`2140DCC58293583A5E4877E6E03FBF919C1BAB1022BD6752F5F33C7AA2B84529`
+
+Frozen structured-X SHA-256:
+
+`6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF`
+
+Continuous outcome artifact:
+
+`data/interim/outcomes/step_5_1/continuous_outcome_panel.parquet`
+
+Continuous outcome SHA-256:
+
+`1AE8A3E29F878D52DE09A3E1011DAF60C56922CF55EABC01CF32EB01959FAE0E`
+
+Predictor sponsor-year rows:
+
+`5464`
+
+Rows with an actual consecutive-year target:
+
+`5178`
+
+Rows with an available continuous funded-ratio-change outcome:
+
+`3392`
+
+Rows without an actual consecutive target-year record:
+
+`286`
+
+Predictor plan-year window:
+
+`2015-2023`
+
+Target plan-year window:
+
+`2016-2024`
+
+Year-alignment violations:
+
+`0`
+
+Same-year target violations:
+
+`0`
+
+Duplicate predictor sponsor-year rows:
+
+`0`
+
+Target imputation:
+
+`NO`
+
+No outcome-distribution statistic was used to select a deterioration
+threshold in Step 5.1.
+
+The material-deterioration threshold `c` remains unselected and is reserved
+for Step 5.2.
+
+The final holdout has not been defined or inspected for model evaluation, and
+model fitting has not started.
+
+### Next authorized step
+
+Step 5.2:
+
+`FREEZE_MATERIAL_DETERIORATION_THRESHOLD_AND_BINARY_OUTCOME`

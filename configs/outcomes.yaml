@@ -1,7 +1,7 @@
-version: 5.0.0
+version: 5.1.0
 milestone: 5
-step: '5.0'
-status: outcome_construction_contract_frozen
+step: '5.1'
+status: continuous_outcome_panel_constructed
 description: One-year-ahead defined-benefit pension funded-status outcome construction, independent
   from model training and final-holdout evaluation.
 release:
@@ -9,7 +9,7 @@ release:
   base_develop_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
   target_tag: v0.6.0-outcomes
   target_tag_created: false
-  release_status: not_ready_step_5_0
+  release_status: not_ready_step_5_1
 branch:
   name: feature/05-outcome-construction
   base_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
@@ -97,10 +97,10 @@ roadmap:
     status: complete
   step_5_1:
     name: construct_one_year_ahead_continuous_outcome_panel
-    status: next
+    status: complete
   step_5_2:
     name: freeze_material_deterioration_threshold_and_binary_outcome
-    status: planned
+    status: next
   step_5_3:
     name: finalize_and_freeze_outcome_artifact
     status: planned
@@ -108,5 +108,44 @@ roadmap:
     name: merge_develop_and_tag_v0_6_0_outcomes
     status: planned
 next_step:
-  id: '5.1'
-  name: construct_one_year_ahead_continuous_outcome_panel
+  id: '5.2'
+  name: freeze_material_deterioration_threshold_and_binary_outcome
+step_5_1_artifacts:
+  continuous_outcome_panel:
+    path: data/interim/outcomes/step_5_1/continuous_outcome_panel.parquet
+    git_tracked: false
+    expected_sha256: 1AE8A3E29F878D52DE09A3E1011DAF60C56922CF55EABC01CF32EB01959FAE0E
+    expected_rows: 5464
+    grain:
+    - sponsor_id
+    - predictor_plan_year
+  outcome_audit:
+    path: reports/validation/milestone5_step_5_1_outcome_audit.json
+    git_tracked: true
+  missingness:
+    path: reports/validation/milestone5_step_5_1_missingness.csv
+    git_tracked: true
+  pairing_audit:
+    path: reports/validation/milestone5_step_5_1_pairing_audit.csv
+    git_tracked: true
+    contains_outcome_values: false
+  coverage_by_year:
+    path: reports/tables/milestone5_step_5_1_coverage_by_year.csv
+    git_tracked: true
+    contains_outcome_distribution_statistics: false
+step_5_1_acceptance:
+  step_5_1_status: PASS
+  input_pension_base_sha256: 2140DCC58293583A5E4877E6E03FBF919C1BAB1022BD6752F5F33C7AA2B84529
+  input_structured_x_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  continuous_outcome_sha256: 1AE8A3E29F878D52DE09A3E1011DAF60C56922CF55EABC01CF32EB01959FAE0E
+  continuous_panel_rows: 5464
+  continuous_outcome_available_rows: 3392
+  missing_consecutive_target_rows: 286
+  year_alignment_violation_count: 0
+  same_year_target_violation_count: 0
+  duplicate_predictor_sponsor_year_rows: 0
+  target_imputation_applied: false
+  threshold_selected: false
+  binary_outcome_constructed: false
+  final_holdout_inspected: false
+  model_fitting_started: false

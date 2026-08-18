@@ -3,8 +3,11 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parents[1]
+
 EXPECTED_FINAL_SHA256 = "6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF"
+
 EXPECTED_TAG = "v0.5.0-structured-panel"
+
 EXPECTED_MERGE_COMMIT = "f7e8077eff9c5baa5f80d3232b7f27ef7a4de2b1"
 
 
@@ -69,4 +72,3 @@ def test_status_preserves_milestone_4_release_after_later_advancement() -> None:
     else:
         assert "PROJECT_STAGE=MILESTONE_5_OUTCOME_CONSTRUCTION_IN_PROGRESS" in status
         assert "MILESTONE5_STEP_5_0_STATUS=PASS" in status
-        assert "NEXT_STEP=5.1" in status
