@@ -210,3 +210,73 @@ model fitting has not started.
 Step 5.2:
 
 `FREEZE_MATERIAL_DETERIORATION_THRESHOLD_AND_BINARY_OUTCOME`
+
+## Step 5.2 - Frozen Material-Deterioration Threshold
+
+Status: PASS.
+
+The primary threshold was frozen before explicit Step-5.2 loading of the
+continuous outcome values.
+
+Primary threshold:
+
+`c = 0.05`
+
+Interpretation:
+
+a decline of at least five absolute funded-ratio percentage points.
+
+Primary binary definition:
+
+`D(i,t+1) = 1{DeltaFR(i,t+1) <= -0.05}`
+
+The threshold was not selected from observed outcome prevalence, quantiles,
+ROC/AUC, model performance, or final-holdout performance.
+
+Threshold prespecification SHA-256:
+
+`9A275DB2FFA12E48889BC1F1FAD3C51F072D1FDDFB215E88115A69BF2B735690`
+
+Frozen continuous input SHA-256:
+
+`1AE8A3E29F878D52DE09A3E1011DAF60C56922CF55EABC01CF32EB01959FAE0E`
+
+Binary interim artifact:
+
+`data/interim/outcomes/step_5_2/binary_outcome_panel.parquet`
+
+Binary interim artifact SHA-256:
+
+`D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F`
+
+Binary panel rows:
+
+`5464`
+
+Rows with available binary outcome:
+
+`3392`
+
+Rows with missing binary outcome:
+
+`2072`
+
+Missing binary outcomes remain missing whenever the continuous outcome was
+unavailable. No target imputation, forward fill, or backfill was performed.
+
+Robustness thresholds are frozen at:
+
+- `0.025`
+- `0.10`
+
+These do not replace the primary `c=0.05` definition.
+
+Threshold retuning after binary construction is not authorized.
+
+The final holdout remains uninspected and model fitting has not started.
+
+### Next authorized step
+
+Step 5.3:
+
+`FINALIZE_AND_FREEZE_OUTCOME_ARTIFACT`

@@ -1,7 +1,7 @@
-version: 5.1.0
+version: 5.2.0
 milestone: 5
-step: '5.1'
-status: continuous_outcome_panel_constructed
+step: '5.2'
+status: binary_outcome_constructed_threshold_frozen
 description: One-year-ahead defined-benefit pension funded-status outcome construction, independent
   from model training and final-holdout evaluation.
 release:
@@ -9,7 +9,7 @@ release:
   base_develop_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
   target_tag: v0.6.0-outcomes
   target_tag_created: false
-  release_status: not_ready_step_5_1
+  release_status: not_ready_step_5_2
 branch:
   name: feature/05-outcome-construction
   base_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
@@ -69,13 +69,29 @@ outcome_contract:
   missing_funded_ratio_policy: preserve_missing_no_imputation
 threshold_contract:
   symbol: c
-  primary_value: null
-  status: pending_step_5_2_prespecification
+  primary_value: 0.05
+  status: frozen_step_5_2
   final_holdout_may_select_threshold: false
   final_holdout_may_tune_threshold: false
   robustness_thresholds_required: true
   rule: Primary c must be frozen before final-holdout evaluation and cannot be selected after inspecting
     final-holdout performance.
+  unit: absolute_funded_ratio_change
+  primary_percentage_points: 5.0
+  interpretation: material deterioration is DeltaFR <= -0.05
+  robustness_thresholds:
+  - 0.025
+  - 0.1
+  prespecification_record: reports/validation/milestone5_step_5_2_threshold_prespecification.json
+  prespecification_sha256: 9A275DB2FFA12E48889BC1F1FAD3C51F072D1FDDFB215E88115A69BF2B735690
+  frozen_utc: '2026-08-18T02:02:10.050564+00:00'
+  frozen_before_binary_construction: true
+  selected_from_outcome_distribution: false
+  selected_from_event_prevalence: false
+  selected_from_quantiles: false
+  selected_from_model_performance: false
+  selected_from_final_holdout: false
+  retuning_authorized: false
 scientific_controls:
   outcome_code_independent_from_model_training: true
   model_fitting_allowed_in_milestone_5: false
@@ -100,16 +116,16 @@ roadmap:
     status: complete
   step_5_2:
     name: freeze_material_deterioration_threshold_and_binary_outcome
-    status: next
+    status: complete
   step_5_3:
     name: finalize_and_freeze_outcome_artifact
-    status: planned
+    status: next
   step_5_4:
     name: merge_develop_and_tag_v0_6_0_outcomes
     status: planned
 next_step:
-  id: '5.2'
-  name: freeze_material_deterioration_threshold_and_binary_outcome
+  id: '5.3'
+  name: finalize_and_freeze_outcome_artifact
 step_5_1_artifacts:
   continuous_outcome_panel:
     path: data/interim/outcomes/step_5_1/continuous_outcome_panel.parquet
@@ -147,5 +163,43 @@ step_5_1_acceptance:
   target_imputation_applied: false
   threshold_selected: false
   binary_outcome_constructed: false
+  final_holdout_inspected: false
+  model_fitting_started: false
+step_5_2_artifacts:
+  binary_outcome_panel:
+    path: data/interim/outcomes/step_5_2/binary_outcome_panel.parquet
+    git_tracked: false
+    expected_sha256: D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F
+    expected_rows: 5464
+    binary_available_rows: 3392
+    grain:
+    - sponsor_id
+    - predictor_plan_year
+    primary_threshold_c: 0.05
+  threshold_prespecification:
+    path: reports/validation/milestone5_step_5_2_threshold_prespecification.json
+    git_tracked: true
+    expected_sha256: 9A275DB2FFA12E48889BC1F1FAD3C51F072D1FDDFB215E88115A69BF2B735690
+  binary_outcome_audit:
+    path: reports/validation/milestone5_step_5_2_binary_outcome_audit.json
+    git_tracked: true
+step_5_2_acceptance:
+  step_5_2_status: PASS
+  primary_threshold_c: 0.05
+  primary_threshold_percentage_points: 5.0
+  threshold_frozen_before_binary_construction: true
+  threshold_selected_from_outcome_distribution: false
+  threshold_selected_from_final_holdout: false
+  threshold_retuning_authorized: false
+  input_continuous_artifact_sha256: 1AE8A3E29F878D52DE09A3E1011DAF60C56922CF55EABC01CF32EB01959FAE0E
+  threshold_prespecification_sha256: 9A275DB2FFA12E48889BC1F1FAD3C51F072D1FDDFB215E88115A69BF2B735690
+  binary_outcome_sha256: D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F
+  binary_panel_rows: 5464
+  binary_outcome_available_rows: 3392
+  binary_outcome_missing_rows: 2072
+  year_alignment_violation_count: 0
+  same_year_target_violation_count: 0
+  duplicate_predictor_sponsor_year_rows: 0
+  target_imputation_applied: false
   final_holdout_inspected: false
   model_fitting_started: false
