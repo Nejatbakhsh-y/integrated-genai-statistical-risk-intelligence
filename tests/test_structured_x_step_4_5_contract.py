@@ -18,14 +18,15 @@ def load_audit():
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def test_step_4_5_contract_is_frozen() -> None:
+def test_step_4_5_scientific_contract_remains_frozen() -> None:
     config = load_config()
     assert config["version"] == "4.5.0"
     assert str(config["step"]) == "4.5"
     assert config["status"] == "structured_x_panel_frozen"
-    assert config["step_4_5_acceptance"]["step_4_5_status"] == "PASS"
-    assert config["step_4_5_acceptance"]["release_ready"] is True
-    assert config["step_4_5_acceptance"]["release_executed"] is False
+    acceptance = config["step_4_5_acceptance"]
+    assert acceptance["step_4_5_status"] == "PASS"
+    assert acceptance["release_ready"] is True
+    assert acceptance["release_executed"] is False
 
 
 def test_final_artifact_hash_and_grain_are_frozen() -> None:
@@ -62,24 +63,17 @@ def test_all_four_families_are_complete() -> None:
     assert final_panel["step_4_5_imputation_applied"] is False
 
 
-def test_release_is_authorized_but_not_executed() -> None:
+def test_step_4_5_historical_release_authorization_is_preserved() -> None:
     config = load_config()
-    release = config["release"]
-    assert release["release_ready"] is True
-    assert release["release_authorized_by_step_4_5"] is True
-    assert release["release_action_status"] == "pending_step_4_6"
-    assert release["target_tag_created"] is False
-    assert config["next_step"] == {
-        "id": "4.6",
-        "name": "merge_develop_and_tag_v0_5_0_structured_panel",
-    }
+    acceptance = config["step_4_5_acceptance"]
+    assert acceptance["release_ready"] is True
+    assert acceptance["release_executed"] is False
+    assert config["release"]["release_authorized_by_step_4_5"] is True
+    assert config["release"]["release_ready"] is True
 
 
-def test_status_hands_off_to_controlled_release() -> None:
+def test_status_preserves_step_4_5_pass_after_release() -> None:
     status = (REPO / "STATUS.md").read_text(encoding="utf-8")
     assert "MILESTONE4_STEP_4_5_STATUS=PASS" in status
     assert "STRUCTURED_X=COMPLETE" in status
     assert "MILESTONE4_RELEASE_READY=YES" in status
-    assert "MILESTONE4_RELEASE_TAG_CREATED=NO" in status
-    assert "NEXT_STEP=4.6" in status
-    assert "NEXT_STEP_NAME=MERGE_DEVELOP_AND_TAG_V0_5_0_STRUCTURED_PANEL" in status

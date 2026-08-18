@@ -83,4 +83,10 @@ def test_step_4_4_handoff_may_advance_to_final_freeze() -> None:
         assert config["primary_artifact"]["status"] == "constructed_and_frozen"
         assert config["step_4_5_acceptance"]["step_4_5_status"] == "PASS"
         assert "STRUCTURED_X=COMPLETE" in status
-    assert config["release"]["target_tag_created"] is False
+    release = config["release"]
+    if release["release_action_status"] == "pending_step_4_6":
+        assert release["target_tag_created"] is False
+    else:
+        assert release["release_action_status"] == "complete_step_4_6"
+        assert release["target_tag_created"] is True
+        assert release["release_executed"] is True

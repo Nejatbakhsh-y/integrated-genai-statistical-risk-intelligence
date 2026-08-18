@@ -9,10 +9,11 @@ description: 'Structured sponsor-year information set X(i,t) integrating pension
 release:
   base_tag: v0.4.0-entity-linkage
   target_tag: v0.5.0-structured-panel
-  target_tag_created: false
+  target_tag_created: true
   release_ready: true
   release_authorized_by_step_4_5: true
-  release_action_status: pending_step_4_6
+  release_action_status: complete_step_4_6
+  release_executed: true
 primary_artifact:
   path: data/processed/sponsor_year_X.parquet
   git_tracked: false
@@ -385,9 +386,6 @@ step_4_2_acceptance:
   interim_parquet_git_tracked: false
   raw_companyfacts_git_tracked: false
   step_4_2_status: PASS
-next_step:
-  id: '4.6'
-  name: merge_develop_and_tag_v0_5_0_structured_panel
 step_4_3_artifacts:
   market_sponsor_year_features:
     path: data/interim/structured_x/step_4_3/market_sponsor_year_features.parquet
@@ -585,3 +583,16 @@ step_4_5_acceptance:
   release_ready: true
   release_executed: false
   step_4_5_status: PASS
+
+step_4_6_release:
+  status: PASS
+  release_tag: v0.5.0-structured-panel
+  source_branch: feature/04-structured-x-panel
+  source_head: ebece51619e3ae49864405efe7a0b38d9b58651f
+  develop_baseline: d735856ca19a32cb418a3dfd634b14fafcafc856
+  merge_commit: f7e8077eff9c5baa5f80d3232b7f27ef7a4de2b1
+  merge_strategy: no_ff
+  atomic_remote_push_required: true
+  final_panel_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  final_panel_git_tracked: false
+  release_metadata_recorded_on_develop: true

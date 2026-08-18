@@ -2,7 +2,7 @@
 
 ## Status
 
-Milestone 4 remains in progress. Step 4.3 ingests and aligns point-in-time market variables to the same frozen sponsor-year forecast cutoff. The final multi-family structured panel is not yet complete, and the release tag `v0.5.0-structured-panel` must not be created at this step.
+Milestone 4 is complete. The structured-X panel is frozen at 5,934 sponsor-year rows with 31 prespecified model features, zero detected temporal violations, and raw missingness preserved. The controlled release is `v0.5.0-structured-panel`.
 
 Target final local analytical artifact:
 
@@ -303,3 +303,19 @@ and Git data-safety gates pass; and the release remains unexecuted.
 Step 4.6 will merge the fully frozen Milestone-4 feature branch into `develop`, verify the
 post-merge repository state, and create/push `v0.5.0-structured-panel` only if every release
 gate remains satisfied.
+
+## Step-4.6 Controlled Release
+
+Step 4.6 releases the frozen Milestone-4 structured-X panel without modifying the analytical
+artifact. The final local panel remains `data/processed/sponsor_year_X.parquet`, remains excluded
+from Git, and retains SHA-256 `6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF`.
+
+The release procedure uses a no-fast-forward merge from `feature/04-structured-x-panel` into
+`develop`, preserving the frozen Step-4.5 feature tip as the merge second parent. Release metadata
+is then recorded on `develop`, the complete repository test suite is rerun, and `develop` plus the
+annotated tag `v0.5.0-structured-panel` are pushed atomically so the branch and tag cannot be published in
+separate remote states.
+
+No raw, interim, or Parquet data artifact enters Git during release. The Step-4.5 scientific
+contract remains historical evidence of pre-release authorization; Step 4.6 changes release-state
+metadata only and does not alter the frozen 31-feature analytical panel.

@@ -71,7 +71,13 @@ def test_step_4_2_financial_family_remains_complete_as_panel_advances() -> None:
         "not_yet_constructed",
         "constructed_and_frozen",
     }
-    assert config["release"]["target_tag_created"] is False
+    release = config["release"]
+    if release["release_action_status"] == "pending_step_4_6":
+        assert release["target_tag_created"] is False
+    else:
+        assert release["release_action_status"] == "complete_step_4_6"
+        assert release["target_tag_created"] is True
+        assert release["release_executed"] is True
 
 
 def test_step_4_2_pension_size_definition_is_frozen() -> None:
