@@ -1,0 +1,112 @@
+version: 5.0.0
+milestone: 5
+step: '5.0'
+status: outcome_construction_contract_frozen
+description: One-year-ahead defined-benefit pension funded-status outcome construction, independent
+  from model training and final-holdout evaluation.
+release:
+  base_tag: v0.5.0-structured-panel
+  base_develop_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
+  target_tag: v0.6.0-outcomes
+  target_tag_created: false
+  release_status: not_ready_step_5_0
+branch:
+  name: feature/05-outcome-construction
+  base_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
+repository_quality_baseline:
+  ruff_lint: PASS
+  pytest: PASS
+  git_diff_check: PASS
+  ruff_format_status: PREEXISTING_EIGHT_FILE_DEBT
+  formatter_debt_count: 8
+  formatter_debt_paths:
+  - scripts/build_milestone4_step_4_1_pension_base.py
+  - src/risk_intelligence/features/outcomes.py
+  - src/risk_intelligence/features/pension_panel.py
+  - src/risk_intelligence/validation/temporal.py
+  - tests/test_outcomes.py
+  - tests/test_pension_panel.py
+  - tests/test_structured_x_step_4_1_contract.py
+  - tests/test_temporal_integrity.py
+  step_5_0_may_modify_formatter_debt: false
+  non_debt_python_format_check: PASS
+upstream_artifacts:
+  structured_x:
+    path: data/processed/sponsor_year_X.parquet
+    git_tracked: false
+    expected_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  pension_sponsor_year_base:
+    path: data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet
+    git_tracked: false
+    expected_sha256: 2140DCC58293583A5E4877E6E03FBF919C1BAB1022BD6752F5F33C7AA2B84529
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    plan_year_start: 2015
+    plan_year_end: 2024
+primary_artifact:
+  path: data/processed/outcomes.parquet
+  git_tracked: false
+  status: not_yet_constructed
+outcome_contract:
+  observation_grain:
+  - sponsor_id
+  - predictor_plan_year
+  horizon_years: 1
+  funded_ratio_definition: FR(i,t) = assets(i,t) / liabilities(i,t)
+  continuous_definition: DeltaFR(i,t+1) = FR(i,t+1) - FR(i,t)
+  binary_definition: D(i,t+1) = 1{DeltaFR(i,t+1) <= -c}
+  negative_delta_means: funding_deterioration
+  target_year_rule: target_plan_year == predictor_plan_year + 1
+  same_year_target_allowed: false
+  nonconsecutive_year_pairing_allowed: false
+  future_target_as_predictor_allowed: false
+  forward_filled_future_target_allowed: false
+  duplicate_sponsor_year_allowed: false
+  positive_liabilities_required: true
+  missing_funded_ratio_policy: preserve_missing_no_imputation
+threshold_contract:
+  symbol: c
+  primary_value: null
+  status: pending_step_5_2_prespecification
+  final_holdout_may_select_threshold: false
+  final_holdout_may_tune_threshold: false
+  robustness_thresholds_required: true
+  rule: Primary c must be frozen before final-holdout evaluation and cannot be selected after inspecting
+    final-holdout performance.
+scientific_controls:
+  outcome_code_independent_from_model_training: true
+  model_fitting_allowed_in_milestone_5: false
+  final_holdout_inspection_allowed_in_milestone_5: false
+  prompt_tuning_allowed_using_outcomes: false
+  threshold_selection_using_final_holdout: false
+  silent_target_imputation_allowed: false
+acceptance_tests:
+- year_alignment
+- no_accidental_same_year_target
+- no_forward_filled_future_information
+- denominator_validity
+- duplicate_sponsor_year_detection
+- threshold_consistency
+- missingness_preservation
+roadmap:
+  step_5_0:
+    name: freeze_outcome_construction_contract_and_kickoff
+    status: complete
+  step_5_1:
+    name: construct_one_year_ahead_continuous_outcome_panel
+    status: next
+  step_5_2:
+    name: freeze_material_deterioration_threshold_and_binary_outcome
+    status: planned
+  step_5_3:
+    name: finalize_and_freeze_outcome_artifact
+    status: planned
+  step_5_4:
+    name: merge_develop_and_tag_v0_6_0_outcomes
+    status: planned
+next_step:
+  id: '5.1'
+  name: construct_one_year_ahead_continuous_outcome_panel
