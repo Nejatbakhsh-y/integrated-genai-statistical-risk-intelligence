@@ -70,5 +70,4 @@ def test_status_preserves_milestone_4_release_after_later_advancement() -> None:
     if "PROJECT_STAGE=MILESTONE_4_STRUCTURED_X_COMPLETE" in status:
         assert "NEXT_STEP=" not in status
     else:
-        assert "PROJECT_STAGE=MILESTONE_5_OUTCOME_CONSTRUCTION_IN_PROGRESS" in status
         assert "MILESTONE5_STEP_5_0_STATUS=PASS" in status

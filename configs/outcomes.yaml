@@ -1,7 +1,7 @@
-version: 5.2.0
+version: 5.3.0
 milestone: 5
-step: '5.2'
-status: binary_outcome_constructed_threshold_frozen
+step: '5.3'
+status: outcome_artifact_finalized_and_frozen
 description: One-year-ahead defined-benefit pension funded-status outcome construction, independent
   from model training and final-holdout evaluation.
 release:
@@ -9,7 +9,10 @@ release:
   base_develop_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
   target_tag: v0.6.0-outcomes
   target_tag_created: false
-  release_status: not_ready_step_5_2
+  release_status: ready_for_step_5_4
+  release_ready: true
+  release_authorized_by_step_5_3: true
+  release_action_status: pending_step_5_4
 branch:
   name: feature/05-outcome-construction
   base_commit: 23733f807a8293f79ae2cc50c87b3d3fc3853c11
@@ -49,7 +52,16 @@ upstream_artifacts:
 primary_artifact:
   path: data/processed/outcomes.parquet
   git_tracked: false
-  status: not_yet_constructed
+  status: constructed_and_frozen
+  expected_sha256: D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F
+  expected_rows: 5464
+  binary_available_rows: 3392
+  binary_missing_rows: 2072
+  primary_threshold_c: 0.05
+  source_step_5_2_binary_sha256: D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F
+  byte_identical_to_step_5_2_binary_panel: true
+  semantic_identity_to_step_5_2_binary_panel: true
+  target_imputation_applied: false
 outcome_contract:
   observation_grain:
   - sponsor_id
@@ -119,13 +131,13 @@ roadmap:
     status: complete
   step_5_3:
     name: finalize_and_freeze_outcome_artifact
-    status: next
+    status: complete
   step_5_4:
     name: merge_develop_and_tag_v0_6_0_outcomes
-    status: planned
+    status: next
 next_step:
-  id: '5.3'
-  name: finalize_and_freeze_outcome_artifact
+  id: '5.4'
+  name: merge_develop_and_tag_v0_6_0_outcomes
 step_5_1_artifacts:
   continuous_outcome_panel:
     path: data/interim/outcomes/step_5_1/continuous_outcome_panel.parquet
@@ -203,3 +215,38 @@ step_5_2_acceptance:
   target_imputation_applied: false
   final_holdout_inspected: false
   model_fitting_started: false
+step_5_3_artifacts:
+  final_outcome_panel:
+    path: data/processed/outcomes.parquet
+    git_tracked: false
+    expected_sha256: D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F
+    expected_rows: 5464
+    binary_available_rows: 3392
+    binary_missing_rows: 2072
+    primary_threshold_c: 0.05
+    byte_identical_to_step_5_2_binary_panel: true
+  final_audit:
+    path: reports/validation/milestone5_step_5_3_final_outcome_audit.json
+    git_tracked: true
+    expected_sha256: E25ABE2A99D93DBF49A3A8E9F9C846271DD13D80ECBEE6DD74D474EFDF2D2AAD
+step_5_3_acceptance:
+  step_5_3_status: PASS
+  final_artifact_status: CONSTRUCTED_AND_FROZEN
+  source_binary_artifact_sha256: D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F
+  final_outcome_artifact_sha256: D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F
+  byte_identical_to_step_5_2_binary_panel: true
+  semantic_identity_to_step_5_2_binary_panel: true
+  final_artifact_rows: 5464
+  binary_outcome_available_rows: 3392
+  binary_outcome_missing_rows: 2072
+  primary_threshold_c: 0.05
+  threshold_status: FROZEN_STEP_5_2
+  threshold_retuning_applied: false
+  year_alignment_violation_count: 0
+  same_year_target_violation_count: 0
+  duplicate_predictor_sponsor_year_rows: 0
+  target_imputation_applied: false
+  missingness_preserved: true
+  final_holdout_inspected: false
+  model_fitting_started: false
+  release_ready_for_step_5_4: true

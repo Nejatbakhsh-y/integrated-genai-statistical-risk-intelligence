@@ -280,3 +280,64 @@ The final holdout remains uninspected and model fitting has not started.
 Step 5.3:
 
 `FINALIZE_AND_FREEZE_OUTCOME_ARTIFACT`
+
+## Step 5.3 - Final Frozen Outcome Artifact
+
+Status: PASS.
+
+Canonical artifact:
+
+`data/processed/outcomes.parquet`
+
+Canonical SHA-256:
+
+`D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F`
+
+Frozen Step-5.2 source SHA-256:
+
+`D66CDC3A18D2FDCE155DAF56A465AFF9F6F9F19E866B72002764CF5FB5D0869F`
+
+The canonical artifact is byte-identical and semantically identical to the
+frozen Step-5.2 binary outcome panel.
+
+Rows:
+
+`5464`
+
+Rows with an available binary target:
+
+`3392`
+
+Rows with a missing binary target:
+
+`2072`
+
+Primary material-deterioration threshold:
+
+`c = 0.05`
+
+No threshold retuning occurred.
+
+No target imputation, forward fill, or backfill was applied.
+
+Year-alignment violations remain zero.
+
+Same-year target violations remain zero.
+
+Duplicate predictor sponsor-years remain zero.
+
+The final holdout remains uninspected.
+
+Model fitting has not started.
+
+The canonical Parquet remains local-only and ignored by Git.
+
+### Release authorization
+
+Milestone-5 outcome construction is complete.
+
+The next authorized operation is Step 5.4:
+
+`MERGE_DEVELOP_AND_TAG_V0_6_0_OUTCOMES`
+
+Step 5.3 itself does not merge develop or create the release tag.
