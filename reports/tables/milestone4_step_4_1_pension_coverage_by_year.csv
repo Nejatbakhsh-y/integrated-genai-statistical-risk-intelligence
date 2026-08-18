@@ -1,0 +1,11 @@
+plan_year,sponsor_year_rows,linked_plan_rows,available_plan_rows_by_cutoff,sponsor_years_with_any_available_plan,sponsor_years_with_no_available_plan,sponsor_years_with_all_linked_plans_available,assets_nonmissing,liabilities_nonmissing,contributions_nonmissing,benefit_payments_nonmissing,participants_nonmissing,funded_ratio_nonmissing,multi_plan_available_sponsor_years,participants_overlap_risk_sponsor_years
+2015,686,1073,713,451,235,429,451,451,422,451,451,451,126,126
+2016,681,1056,638,410,271,387,410,410,389,409,410,409,109,109
+2017,657,1006,828,535,122,510,535,535,510,535,535,535,149,149
+2018,619,958,794,507,112,489,507,507,480,507,507,507,146,146
+2019,604,921,710,458,146,430,458,458,432,456,458,458,130,130
+2020,582,873,715,463,119,447,463,463,440,462,463,463,125,125
+2021,573,839,549,365,208,349,365,365,344,364,365,365,99,99
+2022,548,803,536,355,193,342,355,355,330,355,355,355,99,99
+2023,514,746,599,408,106,393,408,408,383,408,408,408,111,111
+2024,470,675,590,405,65,398,405,405,387,405,405,404,105,105

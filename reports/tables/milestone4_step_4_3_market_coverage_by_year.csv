@@ -1,0 +1,11 @@
+plan_year,sponsor_year_rows,market_close_nonmissing,market_equity_return_nonmissing,market_equity_volatility_nonmissing,market_equity_drawdown_nonmissing,market_capitalization_nonmissing
+2015,686,416,414,414,414,342
+2016,681,422,420,420,420,350
+2017,657,414,413,413,413,343
+2018,619,398,396,396,396,332
+2019,604,397,396,396,396,331
+2020,582,390,390,390,390,326
+2021,573,385,384,384,384,319
+2022,548,372,370,370,370,306
+2023,514,351,351,351,351,291
+2024,470,329,328,328,328,271

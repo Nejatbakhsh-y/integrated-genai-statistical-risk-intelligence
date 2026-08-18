@@ -1,0 +1,587 @@
+version: 4.5.0
+milestone: 4
+step: '4.5'
+status: structured_x_panel_frozen
+description: 'Structured sponsor-year information set X(i,t) integrating pension, sponsor-financial, market,
+  and prespecified macro information under explicit point-in-time information-date controls.
+
+  '
+release:
+  base_tag: v0.4.0-entity-linkage
+  target_tag: v0.5.0-structured-panel
+  target_tag_created: false
+  release_ready: true
+  release_authorized_by_step_4_5: true
+  release_action_status: pending_step_4_6
+primary_artifact:
+  path: data/processed/sponsor_year_X.parquet
+  git_tracked: false
+  status: constructed_and_frozen
+  expected_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  expected_rows: 5934
+  expected_unique_sponsors: 729
+  expected_unique_ciks: 729
+  grain:
+  - sponsor_id
+  - plan_year
+step_4_1_artifact:
+  path: data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet
+  git_tracked: false
+  expected_sha256: 2140DCC58293583A5E4877E6E03FBF919C1BAB1022BD6752F5F33C7AA2B84529
+  expected_rows: 5934
+  expected_unique_sponsors: 729
+  grain:
+  - sponsor_id
+  - plan_year
+step_4_2_artifacts:
+  sec_sponsor_year_financials:
+    path: data/interim/structured_x/step_4_2/sec_sponsor_year_financials.parquet
+    git_tracked: false
+    expected_sha256: 92C7F0A2FD89D0A75C3175FE00544B975C2371C2C27B3DFAD4591962E4FA45C8
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  joined_pension_sec_base:
+    path: data/interim/structured_x/step_4_2/pension_sec_sponsor_year_base.parquet
+    git_tracked: false
+    expected_sha256: 09F93E43AA169CE95A7AF98E923C0E6FF6DFEEE8E987564A90E9A86BD7EC7883
+    expected_rows: 5934
+    grain:
+    - sponsor_id
+    - plan_year
+panel:
+  grain:
+  - sponsor_id
+  - plan_year
+  sponsor_population: milestone_3_linked_public_sponsors
+  plan_year_start: 2015
+  plan_year_end: 2024
+frozen_inputs:
+  sponsor_plan_universe:
+    path: data/processed/sponsor_plan_universe.parquet
+    expected_sha256: ED22F81E6F6E407F0494CDBB94AB6D8FA84B9CF576C637D02E20A013735E6255
+    expected_rows: 79782
+    expected_unique_sponsors: 11520
+    expected_unique_plans: 13527
+  sponsor_sec_crosswalk:
+    path: data/processed/sponsor_sec_crosswalk.parquet
+    expected_sha256: 264FF2DCD22223B654C122B7EE6F69B23CEA71A8885937D976C1BBCF8203D55A
+    expected_linked_sponsors: 729
+    expected_unique_ciks: 729
+  linked_pension_population:
+    expected_plan_rows: 8950
+    expected_unique_plans: 1294
+    expected_unique_sponsors: 729
+    expected_unique_sponsor_years: 5934
+  step_4_1_pension_base:
+    path: data/interim/structured_x/step_4_1/pension_sponsor_year_base.parquet
+    expected_sha256: 2140DCC58293583A5E4877E6E03FBF919C1BAB1022BD6752F5F33C7AA2B84529
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  step_4_2_joined_base:
+    path: data/interim/structured_x/step_4_2/pension_sec_sponsor_year_base.parquet
+    expected_sha256: 09F93E43AA169CE95A7AF98E923C0E6FF6DFEEE8E987564A90E9A86BD7EC7883
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  step_4_3_joined_base:
+    path: data/interim/structured_x/step_4_3/pension_sec_market_sponsor_year_base.parquet
+    expected_sha256: 0A3F6922EA0FE3D83058EC980B19174C5213EE1188CAA8BED8ADE69657D8F9EB
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+raw_source_provenance:
+  sec_companyfacts:
+    source_family: SEC_EDGAR_XBRL_COMPANYFACTS
+    endpoint_template: https://data.sec.gov/api/xbrl/companyfacts/CIK##########.json
+    authentication_required: false
+    local_raw_directory: data/raw/sec_xbrl/companyfacts
+    git_tracked: false
+    manifest: reports/validation/milestone4_step_4_2_raw_companyfacts_manifest.csv
+    attempted_ciks: 729
+    http_200_or_cache: 724
+    http_404_no_companyfacts: 5
+  sec_ticker_associations:
+    source_family: SEC_CURRENT_TICKER_EXCHANGE_ASSOCIATIONS
+    endpoint: https://www.sec.gov/files/company_tickers_exchange.json
+    authentication_required: false
+    identifier_metadata_only: true
+    local_raw_path: data/raw/sec_reference/company_tickers_exchange.json
+    git_tracked: false
+    tracked_mapping_audit: reports/validation/milestone4_step_4_3_sec_ticker_mapping.csv
+    target_ciks: 729
+    ciks_with_association: 450
+  yahoo_finance_daily_equity:
+    source_family: YAHOO_FINANCE_CHART_DAILY
+    endpoint_template: https://query1.finance.yahoo.com/v8/finance/chart/{symbol}
+    authentication_required: false
+    local_raw_directory: data/raw/market/yahoo_finance
+    git_tracked: false
+    manifest: reports/validation/milestone4_step_4_3_market_raw_manifest.csv
+    required_currency: USD
+    ciks_with_usable_price_history: 450
+  alfred_macro_vintages:
+    source_family: ALFRED_VINTAGE_GRAPH_CSV
+    endpoint: https://alfred.stlouisfed.org/graph/alfredgraph.csv
+    authentication_required: false
+    local_raw_directory: data/raw/macro/alfred
+    git_tracked: false
+    manifest: reports/validation/milestone4_step_4_4_macro_raw_manifest.csv
+    unique_forecast_cutoffs: 10
+    raw_snapshot_requests: 40
+    series_ids:
+    - DGS10
+    - CPIAUCNS
+    - NFCI
+    - UNRATE
+sponsor_financial_alignment:
+  transformation_version: 4.2.0
+  source_family: SEC_EDGAR_XBRL
+  monetary_unit: USD
+  annual_forms:
+  - 10-K
+  - 10-K/A
+  - 10-KT
+  - 10-KT/A
+  - 20-F
+  - 20-F/A
+  - 40-F
+  - 40-F/A
+  fiscal_year_rule: XBRL fact fy == sponsor plan_year
+  temporal_eligibility_rule: fact filed_date <= sponsor-year forecast_cutoff
+  period_end_rule: fact period_end <= sponsor-year forecast_cutoff
+  duration_rule: annual duration contexts must span 250 through 450 days inclusive
+  selection_rule: 'Among eligible synonym concepts, select the latest period_end, then the latest filed_date,
+    then the lowest frozen concept-priority rank, then accession number.
+
+    '
+  future_backfill_allowed: false
+  retrospective_restated_value_after_cutoff_allowed: false
+  non_usd_currency_conversion_allowed: false
+  concept_priority:
+    total_assets:
+    - us-gaap:Assets
+    - ifrs-full:Assets
+    total_liabilities:
+    - us-gaap:Liabilities
+    - ifrs-full:Liabilities
+    debt:
+    - us-gaap:LongTermDebtAndFinanceLeaseObligations
+    - us-gaap:LongTermDebt
+    - us-gaap:LongTermDebtAndFinanceLeaseObligationsNoncurrent
+    - us-gaap:LongTermDebtNoncurrent
+    - ifrs-full:Borrowings
+    - ifrs-full:NoncurrentBorrowings
+    cash:
+    - us-gaap:CashAndCashEquivalentsAtCarryingValue
+    - us-gaap:CashCashEquivalentsRestrictedCashAndRestrictedCashEquivalents
+    - ifrs-full:CashAndCashEquivalents
+    revenue:
+    - us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax
+    - us-gaap:SalesRevenueNet
+    - us-gaap:Revenues
+    - ifrs-full:Revenue
+    operating_income:
+    - us-gaap:OperatingIncomeLoss
+    - ifrs-full:ProfitLossFromOperatingActivities
+    operating_cash_flow:
+    - us-gaap:NetCashProvidedByUsedInOperatingActivities
+    - ifrs-full:CashFlowsFromUsedInOperatingActivities
+    pension_plan_assets:
+    - us-gaap:DefinedBenefitPlanFairValueOfPlanAssets
+    - ifrs-full:FairValueOfPlanAssets
+    pension_projected_benefit_obligation:
+    - us-gaap:DefinedBenefitPlanProjectedBenefitObligation
+    - ifrs-full:PresentValueOfDefinedBenefitObligation
+    pension_employer_contributions:
+    - us-gaap:DefinedBenefitPlanContributionsByEmployer
+    - ifrs-full:ContributionsByEmployer
+  derived_variables:
+    profitability: sec_operating_income / sec_revenue
+    leverage: sec_total_liabilities / sec_total_assets
+    liquidity: sec_cash / sec_total_assets
+    pension_size: Form5500 pension liabilities / sec_total_assets
+    pension_assets_to_sponsor_assets: Form5500 pension assets / sec_total_assets
+    pension_contributions_to_revenue: Form5500 contributions / sec_revenue
+data_families:
+  pension:
+    status: step_4_1_base_constructed_step_4_2_denominator_added
+    fields:
+    - funded_ratio
+    - assets
+    - liabilities
+    - contributions
+    - benefit_payments
+    - participants
+    - pension_size
+    - pension_assets_to_sponsor_assets
+    - pension_liabilities_to_sponsor_assets
+    - pension_contributions_to_revenue
+    pension_size_status: defined_step_4_2_as_form5500_liabilities_over_sec_total_assets
+  sponsor_financials:
+    status: step_4_2_complete
+    source_family: SEC_EDGAR_XBRL
+    fields:
+    - sec_total_assets
+    - sec_total_liabilities
+    - sec_debt
+    - sec_cash
+    - sec_revenue
+    - sec_operating_income
+    - sec_operating_cash_flow
+    - sec_profitability
+    - sec_leverage
+    - sec_liquidity
+    - sec_pension_plan_assets
+    - sec_pension_projected_benefit_obligation
+    - sec_pension_employer_contributions
+    raw_missingness_preserved: true
+  market:
+    status: step_4_3_complete
+    source_family: YAHOO_FINANCE_CHART_DAILY_PLUS_SEC_SHARES
+    fields:
+    - market_equity_return
+    - market_equity_volatility
+    - market_equity_drawdown
+    - market_capitalization
+    supporting_fields:
+    - market_close
+    - market_adjusted_close
+    - market_price_provider
+    - market_price_currency
+    - market_ticker_candidate_count
+    - market_price_information_date
+    - market_shares_outstanding
+    - market_shares_split_basis_factor
+    - market_shares_split_adjusted
+    - market_shares_filed_date
+    - market_source_symbol
+    raw_missingness_preserved: true
+  macro:
+    status: step_4_4_complete
+    source_family: ALFRED_VINTAGE_GRAPH_CSV
+    fields:
+    - macro_interest_rate_10y
+    - macro_inflation_yoy
+    - macro_credit_conditions_nfci
+    - macro_unemployment_rate
+    supporting_fields:
+    - macro_vintage_date
+    - macro_interest_rate_10y_observation_date
+    - macro_inflation_observation_date
+    - macro_inflation_prior_year_observation_date
+    - macro_credit_conditions_nfci_observation_date
+    - macro_unemployment_rate_observation_date
+    - macro_transformation_version
+    raw_missingness_preserved: true
+pension_aggregation:
+  target_grain: sponsor_year
+  temporal_eligibility_rule: plan information_date <= sponsor-year forecast_cutoff
+  monetary_fields:
+    rule: sum_across_available_plans_if_field_complete_within_available_set
+    partial_sum_if_available_plan_field_missing: false
+  funded_ratio:
+    rule: aggregate_assets_divided_by_aggregate_liabilities
+    require_positive_liabilities: true
+    unweighted_plan_ratio_mean_allowed: false
+  participants:
+    rule: sum_across_available_plans_if_field_complete_within_available_set
+    overlap_audit_required: true
+    overlap_risk_flag: participants_overlap_risk
+  source_provenance:
+    available_plan_source_files_retained: true
+  pension_size:
+    status: defined_step_4_2
+    rule: Form5500 aggregate pension liabilities divided by SEC total assets
+    require_positive_sec_total_assets: true
+temporal_integrity:
+  required_columns:
+  - information_date
+  - forecast_cutoff
+  governing_rule: information_date <= forecast_cutoff
+  future_information_allowed: false
+  forward_fill_from_future_allowed: false
+  retrospective_value_substitution_allowed: false
+  forecast_cutoff_policy:
+    status: frozen_step_4_1
+    policy_id: OCTOBER_15_T_PLUS_1
+    rule: October 15 of calendar year t+1
+    plan_year_reference: t
+    month: 10
+    day: 15
+    common_across_sponsors_within_plan_year: true
+    outcome_independent: true
+    candidate_cutoff_diagnostics_required: true
+    candidate_policy_ids:
+    - JULY_31_T_PLUS_1
+    - SEPTEMBER_30_T_PLUS_1
+    - OCTOBER_15_T_PLUS_1
+    - DECEMBER_31_T_PLUS_1
+  analytical_availability:
+    late_plan_filings_excluded: true
+    missing_information_date_excluded: true
+    sponsor_year_skeleton_retained_when_no_plan_is_available: true
+    sec_facts_filed_after_cutoff_excluded: true
+    sec_facts_for_other_fiscal_years_excluded: true
+    sponsor_year_retained_when_sec_financials_missing: true
+    market_prices_after_cutoff_excluded: true
+    market_shares_filed_after_cutoff_excluded: true
+    sponsor_year_retained_when_market_data_missing: true
+    current_ticker_metadata_used_as_model_feature: false
+    macro_vintage_after_cutoff_excluded: true
+    macro_observations_after_cutoff_excluded: true
+    sponsor_year_retained_when_macro_data_missing: true
+    retrospective_macro_revision_after_cutoff_allowed: false
+missingness:
+  silent_zero_fill_allowed: false
+  future_backfill_allowed: false
+  partial_plan_sum_when_available_field_missing: false
+  sec_missingness_preserved: true
+  non_usd_sec_facts_preserved_as_missing: true
+  final_imputation_policy_status: raw_missingness_preserved_in_frozen_panel_no_step_4_5_imputation
+  market_missingness_preserved: true
+  market_future_backfill_allowed: false
+  market_zero_fill_allowed: false
+  macro_missingness_preserved: true
+  macro_future_backfill_allowed: false
+  macro_zero_fill_allowed: false
+scientific_controls:
+  outcome_data_may_define_features: false
+  final_holdout_may_define_features: false
+  post_cutoff_information_allowed: false
+  raw_source_provenance_required: true
+  transformation_version_required: true
+step_4_0_acceptance:
+  milestone_3_release_verified: true
+  crosswalk_hash_verified: true
+  linked_population_reconciled: true
+  structured_x_contract_frozen: true
+  forecast_cutoff_policy_frozen: false
+  structured_x_constructed: false
+step_4_1_acceptance:
+  forecast_cutoff_policy_frozen: true
+  pension_sponsor_year_base_constructed: true
+  expected_sponsor_year_rows_verified: true
+  deterministic_multi_plan_aggregation_verified: true
+  temporal_integrity_verified: true
+  duplicate_audit_verified: true
+  missingness_audit_verified: true
+  aggregation_identity_audit_verified: true
+  interim_parquet_git_tracked: false
+  step_4_1_status: PASS
+step_4_2_acceptance:
+  step_4_1_artifact_hash_frozen: true
+  linked_ciks_attempted: 729
+  sec_companyfacts_ingested: true
+  fiscal_year_alignment_verified: true
+  deterministic_concept_selection_verified: true
+  temporal_integrity_verified: true
+  temporal_violation_count: 0
+  sponsor_year_grain_preserved: true
+  expected_sponsor_year_rows_verified: true
+  missingness_preserved: true
+  pension_size_denominator_defined: true
+  interim_parquet_git_tracked: false
+  raw_companyfacts_git_tracked: false
+  step_4_2_status: PASS
+next_step:
+  id: '4.6'
+  name: merge_develop_and_tag_v0_5_0_structured_panel
+step_4_3_artifacts:
+  market_sponsor_year_features:
+    path: data/interim/structured_x/step_4_3/market_sponsor_year_features.parquet
+    git_tracked: false
+    expected_sha256: C6F592579F8F0509C7786A81886F8FF7DB8ACFE927E731617586E3DEED9C58BA
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  joined_pension_sec_market_base:
+    path: data/interim/structured_x/step_4_3/pension_sec_market_sponsor_year_base.parquet
+    git_tracked: false
+    expected_sha256: 0A3F6922EA0FE3D83058EC980B19174C5213EE1188CAA8BED8ADE69657D8F9EB
+    expected_rows: 5934
+    grain:
+    - sponsor_id
+    - plan_year
+market_alignment:
+  transformation_version: 4.3.0
+  price_source_family: YAHOO_FINANCE_CHART_DAILY
+  ticker_mapping_source: SEC_CURRENT_TICKER_EXCHANGE_ASSOCIATIONS
+  ticker_mapping_role: identifier metadata only; not a model feature
+  ticker_mapping_selection_rule: within CIK sort by shortest SEC ticker, then ticker, then exchange; use
+    first Yahoo-compatible symbol returning USD daily history
+  price_currency: USD required; non-USD histories remain missing
+  forecast_cutoff_rule: latest trading close on or before forecast_cutoff
+  return_price_basis: adjusted close
+  market_cap_price_basis: regular close on provider split basis
+  trailing_window_price_observations: 253
+  trailing_window_trading_intervals: 252
+  equity_return_rule: adjusted_close_t / adjusted_close_t_minus_252_trading_intervals - 1
+  equity_volatility_rule: std(daily log returns) * sqrt(252)
+  equity_drawdown_rule: minimum(adjusted_close / running_peak - 1) over trailing window
+  shares_outstanding_source: SEC Company Facts cached in Step 4.2
+  shares_outstanding_concept_priority:
+  - dei:EntityCommonStockSharesOutstanding
+  - us-gaap:CommonStockSharesOutstanding
+  shares_temporal_rule: latest eligible periodic-filing shares fact with filed_date <= cutoff and period_end
+    <= cutoff
+  market_capitalization_rule: regular market_close multiplied by point-in-time SEC shares normalized to
+    the provider split basis; constructed only for a unique-ticker CIK
+  split_basis_normalization_rule: multiply SEC shares by cumulative provider split ratios after the selected
+    shares period_end; split metadata is unit-normalization provenance only
+  future_price_backfill_allowed: false
+  future_share_filing_backfill_allowed: false
+  manual_ticker_inference_allowed: false
+  raw_missingness_preserved: true
+step_4_3_acceptance:
+  step_4_2_artifact_hash_verified: true
+  target_ciks: 729
+  sec_ticker_association_snapshot_ingested: true
+  daily_market_history_ingested: true
+  point_in_time_price_alignment_verified: true
+  point_in_time_shares_alignment_verified: true
+  trailing_252_interval_features_verified: true
+  temporal_integrity_verified: true
+  temporal_violation_count: 0
+  sponsor_year_grain_preserved: true
+  expected_sponsor_year_rows_verified: true
+  missingness_preserved: true
+  market_capitalization_constructed: true
+  interim_parquet_git_tracked: false
+  raw_market_data_git_tracked: false
+  step_4_3_status: PASS
+step_4_4_artifacts:
+  macro_sponsor_year_features:
+    path: data/interim/structured_x/step_4_4/macro_sponsor_year_features.parquet
+    git_tracked: false
+    expected_sha256: 99D8B48E8AC061110980D27D51549E8B7881970676E23CEEE5979E8CD38E2EE9
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+  joined_pension_sec_market_macro_base:
+    path: data/interim/structured_x/step_4_4/pension_sec_market_macro_sponsor_year_base.parquet
+    git_tracked: false
+    expected_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+    expected_rows: 5934
+    grain:
+    - sponsor_id
+    - plan_year
+macro_alignment:
+  transformation_version: 4.4.0
+  source_family: ALFRED_VINTAGE_GRAPH_CSV
+  source_role: historical real-time macro snapshot
+  vintage_date_rule: vintage_date == forecast_cutoff
+  observation_rule: latest valid observation on or before forecast_cutoff
+  interest_rate_series: DGS10
+  interest_rate_definition: 10-year U.S. Treasury constant-maturity market yield, percent
+  inflation_series: CPIAUCNS
+  inflation_definition: 100 * (latest CPI level / same-month prior-year CPI level - 1) within the same
+    ALFRED cutoff vintage
+  credit_conditions_series: NFCI
+  credit_conditions_definition: Chicago Fed National Financial Conditions Index; positive is tighter than
+    average
+  unemployment_series: UNRATE
+  unemployment_definition: U-3 unemployment rate, percent, seasonally adjusted
+  future_vintage_backfill_allowed: false
+  future_observation_backfill_allowed: false
+  retrospective_revision_after_cutoff_allowed: false
+  silent_zero_fill_allowed: false
+  raw_missingness_preserved: true
+step_4_4_acceptance:
+  step_4_3_artifact_hash_verified: true
+  unique_forecast_cutoffs: 10
+  alfred_vintage_snapshots_ingested: true
+  macro_series_registry_frozen: true
+  point_in_time_vintage_alignment_verified: true
+  point_in_time_observation_alignment_verified: true
+  temporal_integrity_verified: true
+  temporal_violation_count: 0
+  sponsor_year_grain_preserved: true
+  expected_sponsor_year_rows_verified: true
+  missingness_preserved: true
+  interim_parquet_git_tracked: false
+  raw_macro_data_git_tracked: false
+  step_4_4_status: PASS
+final_panel:
+  transformation_version: 4.5.0
+  construction_rule: byte-for-byte promotion of the frozen Step-4.4 joined pension/SEC/market/macro artifact;
+    no Step-4.5 value transformation
+  source_artifact: data/interim/structured_x/step_4_4/pension_sec_market_macro_sponsor_year_base.parquet
+  source_artifact_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  final_artifact_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+  byte_identical_to_step_4_4_joined: true
+  rows: 5934
+  unique_sponsors: 729
+  unique_ciks: 729
+  model_feature_count: 31
+  model_feature_families:
+    pension:
+    - funded_ratio
+    - assets
+    - liabilities
+    - contributions
+    - benefit_payments
+    - participants
+    - pension_size
+    - pension_assets_to_sponsor_assets
+    - pension_liabilities_to_sponsor_assets
+    - pension_contributions_to_revenue
+    sponsor_financials:
+    - sec_total_assets
+    - sec_total_liabilities
+    - sec_debt
+    - sec_cash
+    - sec_revenue
+    - sec_operating_income
+    - sec_operating_cash_flow
+    - sec_profitability
+    - sec_leverage
+    - sec_liquidity
+    - sec_pension_plan_assets
+    - sec_pension_projected_benefit_obligation
+    - sec_pension_employer_contributions
+    market:
+    - market_equity_return
+    - market_equity_volatility
+    - market_equity_drawdown
+    - market_capitalization
+    macro:
+    - macro_interest_rate_10y
+    - macro_inflation_yoy
+    - macro_credit_conditions_nfci
+    - macro_unemployment_rate
+  missingness_preserved: true
+  step_4_5_imputation_applied: false
+  forecast_cutoff_policy: OCTOBER_15_T_PLUS_1
+  temporal_violation_count: 0
+step_4_5_artifacts:
+  final_structured_x_panel:
+    path: data/processed/sponsor_year_X.parquet
+    git_tracked: false
+    expected_sha256: 6E7C3954CE1F23110B4A88E7A83E5CEC5C6B759825670DB9A90682CE5AA56ACF
+    expected_rows: 5934
+    expected_unique_sponsors: 729
+    expected_unique_ciks: 729
+    grain:
+    - sponsor_id
+    - plan_year
+  final_panel_audit:
+    path: reports/validation/milestone4_step_4_5_final_panel_audit.json
+    git_tracked: true
+step_4_5_acceptance:
+  step_4_4_artifact_hash_verified: true
+  all_four_data_families_complete: true
+  final_artifact_materialized: true
+  final_artifact_byte_identical_to_step_4_4_joined: true
+  expected_sponsor_year_rows_verified: true
+  expected_unique_sponsors_verified: true
+  expected_unique_ciks_verified: true
+  duplicate_audit_verified: true
+  temporal_integrity_verified: true
+  missingness_preserved: true
+  step_4_5_imputation_applied: false
+  final_parquet_git_tracked: false
+  release_ready: true
+  release_executed: false
+  step_4_5_status: PASS

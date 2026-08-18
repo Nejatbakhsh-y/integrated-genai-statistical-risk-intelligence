@@ -1,0 +1,7 @@
+field,sponsor_year_rows,missing_count,nonmissing_count,missing_rate
+market_close,5934,2060,3874,0.3471520053926525
+market_equity_return,5934,2072,3862,0.3491742500842602
+market_equity_volatility,5934,2072,3862,0.3491742500842602
+market_equity_drawdown,5934,2072,3862,0.3491742500842602
+market_shares_outstanding,5934,471,5463,0.07937310414560161
+market_capitalization,5934,2723,3211,0.45888102460397706

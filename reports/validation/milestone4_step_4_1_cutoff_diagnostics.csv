@@ -1,0 +1,5 @@
+cutoff_policy_id,month,day,linked_plan_rows,eligible_plan_rows,eligible_plan_rate,sponsor_year_rows,sponsor_years_with_any_available_plan,sponsor_years_with_all_linked_plans_available,selected_policy
+JULY_31_T_PLUS_1,7,31,8950,240,0.026815642458100558,5934,212,183,False
+SEPTEMBER_30_T_PLUS_1,9,30,8950,1016,0.11351955307262569,5934,728,658,False
+OCTOBER_15_T_PLUS_1,10,15,8950,6672,0.7454748603351955,5934,4357,4174,True
+DECEMBER_31_T_PLUS_1,12,31,8950,7522,0.8404469273743017,5934,4936,4762,False

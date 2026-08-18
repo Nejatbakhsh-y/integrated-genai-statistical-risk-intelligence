@@ -1,0 +1,7 @@
+identity,compared_sponsor_years,mismatch_rows,max_abs_difference,status
+assets_complete_sum,5934,0,0.0,PASS
+liabilities_complete_sum,5934,0,0.0,PASS
+contributions_complete_sum,5934,0,0.0,PASS
+benefit_payments_complete_sum,5934,0,0.0,PASS
+participants_complete_sum,5934,0,0.0,PASS
+funded_ratio_equals_assets_divided_by_liabilities,5934,0,0.0,PASS
